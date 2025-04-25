@@ -47,7 +47,7 @@
 <body>
   <h2>🔥 KFC 會員問卷連結產生器</h2>
   <label>門市代碼</label>
-  <input type="text" id="store" placeholder="請輸入門市代碼" />
+  <input type="text" id="store" placeholder="請輸入門市代碼，如095" />
   <label>點餐方式</label>
   <select id="o">
     <option value="2">2 = 網訂</option>
@@ -82,7 +82,7 @@
       const k = document.getElementById('k').value;
 
       if (!store.match(/^\d+$/)) {
-        alert('請輸入有效門市代碼');
+        alert('請輸入有效門市代碼（如095）');
         return;
       }
 
