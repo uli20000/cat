@@ -3,92 +3,107 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>KFC 問卷連結產生器</title>
+  <title>問卷連結產生器</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #fff;
-      max-width: 480px;
-      margin: 50px auto;
-      padding: 20px;
+      font-family: "Microsoft JhengHei", sans-serif;
+      background-color: #fdf8f3;
+      display: flex;
+      justify-content: center;
+      padding: 30px;
+    }
+    .container {
+      background-color: #fffaf2;
+      padding: 30px 25px;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.05);
+      width: 100%;
+      max-width: 420px;
     }
     h2 {
       text-align: center;
-      color: #d42113;
+      color: #8b5e3c;
+      margin-bottom: 30px;
     }
     label {
       display: block;
-      margin-top: 20px;
+      margin-top: 16px;
+      margin-bottom: 6px;
+      color: #5b3e2b;
       font-weight: bold;
     }
-    select, input, button {
+    input, select {
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       font-size: 16px;
-      margin-top: 5px;
+      font-weight: bold;
+      color: #000;
+      background-color: #fffdf9;
+      border: 1px solid #decfc1;
+      border-radius: 6px;
       box-sizing: border-box;
     }
     button {
+      width: 100%;
+      padding: 14px;
       margin-top: 30px;
-      background-color: #d42113;
+      font-size: 16px;
+      background-color: #c8a68a;
       color: white;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background-color: #b89275;
     }
     #result {
       margin-top: 20px;
-      word-break: break-word;
       font-size: 14px;
-      background: #f9f9f9;
+      background: #f7f3ee;
       padding: 10px;
-      border: 1px solid #ccc;
+      border: 1px solid #d7c7b8;
       border-radius: 6px;
+      word-break: break-word;
     }
     #copyBtn {
       display: none;
-      background-color: #555;
+      background-color: #9f826c;
       margin-top: 10px;
     }
   </style>
 </head>
 <body>
 
-  <h2>🍗 KFC 問卷連結產生器</h2>
+  <div class="container">
+    <h2>問卷連結產生器</h2>
 
-  <label>門市代碼</label>
-  <input type="text" id="store" placeholder="請輸入門市代碼" />
+    <label for="store">門市代碼</label>
+    <input type="text" id="store" maxlength="3" placeholder="請輸入門市代碼"/>
 
-  <label>點餐方式</label>
-  <select id="o">
-    <option value="2">2 = 櫃檯</option>
-    <option value="3">3 = 點餐機</option>
-    <option value="4" selected>4 = 網訂</option>
-  </select>
+    <label for="o">點餐方式</label>
+    <select id="o">
+      <option value="2">櫃檯</option>
+      <option value="3">點餐機</option>
+      <option value="6" selected>網訂</option>
+    </select>
 
-  <label>訂購方式</label>
-  <select id="k">
-    <option value="1">1 = 內用</option>
-    <option value="2" selected>2 = 外帶</option>
-  </select>
+    <label for="k">訂購方式</label>
+    <select id="k">
+      <option value="1">內用</option>
+      <option value="2" selected>外帶</option>
+    </select>
 
-  <button onclick="generateLink()">🔗 產生問卷連結</button>
+    <button onclick="generateLinks()">🎯 產生三組問卷連結</button>
 
-  <div id="result"></div>
-  <button id="copyBtn" onclick="copyLink()">📋 複製連結</button>
+    <div id="result"></div>
+    <button id="copyBtn" onclick="copyLinks()">📋 複製全部連結</button>
+  </div>
 
   <script>
-    function generateLink() {
-      const store = document.getElementById('store').value.trim();
-      const o = document.getElementById('o').value;
-      const k = document.getElementById('k').value;
-
-      if (!store) {
-        alert("請輸入門市代碼！");
-        return;
-      }
-
-      // 以下為固定參數產生邏輯，可替換為會員問卷模式
+    function generateSingleLink(store, o, k) {
+      const prefix = store.startsWith('5') ? 'TWB' : 'TWI';
       const now = new Date();
       const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
       const D = date.toISOString().slice(0, 10).replace(/-/g, '');
@@ -96,19 +111,19 @@
       const rand1 = String(Math.floor(Math.random() * 90) + 10);
       const rand2 = String(Math.floor(Math.random() * 50) + 10);
       const rand3 = String(Math.floor(Math.random() * 89) + 11);
-      const U = `TWI${store}${D}${H}${rand1}${rand2}${rand3}`;
+      const U = `${prefix}${store}${D}${H}${rand1}${rand2}${rand3}`;
       const T = `${H}${String(Math.floor(Math.random() * 60)).padStart(2, '0')}${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`;
 
       const data = {
-        S: `886KTWI${store}`,
+        S: `886K${prefix}${store}`,
         U,
         D,
         T,
         Country: "TW",
         O: o,
-        M: "2", // 非會員固定為2
+        M: "2",
         K: k,
-        I: "2" // 非會員固定為2
+        I: "2"
       };
 
       const q_eed = btoa(JSON.stringify(data))
@@ -116,17 +131,37 @@
         .replace(/\//g, "_")
         .replace(/=+$/, "");
 
-      const link = `https://customer.kfc-listens.com/jfe/form/SV_1R1VSPEYVPlV1JA?Q_EED=${q_eed}`;
-
-      document.getElementById('result').innerHTML = `<strong>產生連結：</strong><br><a href="${link}" target="_blank">${link}</a>`;
-      document.getElementById('copyBtn').style.display = 'block';
-      document.getElementById('copyBtn').setAttribute('data-link', link);
+      return `https://customer.kfc-listens.com/jfe/form/SV_1R1VSPEYVPlV1JA?Q_EED=${q_eed}`;
     }
 
-    function copyLink() {
-      const link = document.getElementById('copyBtn').getAttribute('data-link');
-      navigator.clipboard.writeText(link).then(() => {
-        alert('✅ 問卷連結已複製到剪貼簿！');
+    function generateLinks() {
+      const store = document.getElementById('store').value.trim().toUpperCase();
+      const o = document.getElementById('o').value;
+      const k = document.getElementById('k').value;
+
+      if (!store || store.length < 1 || store.length > 3) {
+        alert("請輸入正確門市代碼！");
+        return;
+      }
+
+      let linksHTML = "";
+      let linksArray = [];
+
+      for (let i = 0; i < 3; i++) {
+        const link = generateSingleLink(store, o, k);
+        linksHTML += `<div><strong>🔗 問卷連結 ${i+1}：</strong><br><a href="${link}" target="_blank">${link}</a></div><br>`;
+        linksArray.push(link);
+      }
+
+      document.getElementById('result').innerHTML = linksHTML;
+      document.getElementById('copyBtn').style.display = 'block';
+      document.getElementById('copyBtn').setAttribute('data-links', linksArray.join('\n'));
+    }
+
+    function copyLinks() {
+      const linksText = document.getElementById('copyBtn').getAttribute('data-links');
+      navigator.clipboard.writeText(linksText).then(() => {
+        alert('✅ 全部問卷連結已複製到剪貼簿！');
       });
     }
   </script>
