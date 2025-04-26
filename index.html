@@ -67,7 +67,7 @@
     <h2>問卷連結產生器</h2>
 
     <label for="store">門市代碼</label>
-    <input type="text" id="store" maxlength="3" placeholder="請輸入門市代碼"/>
+    <input type="text" id="store" maxlength="3" value="226" />
 
     <label for="o">點餐方式</label>
     <select id="o">
@@ -131,9 +131,9 @@
       const link = generateSingleLink(store, o, k);
 
       navigator.clipboard.writeText(link).then(() => {
-        alert('✅ 問卷連結已成功產生並複製到剪貼簿！');
+        alert('✅ 問卷連結已成功產生並複製到剪貼簿。');
       }).catch(() => {
-        alert('⚠️ 無法複製到剪貼簿，請手動複製！');
+        alert('⚠️ 無法複製到剪貼簿，請手動複製。');
       });
     }
   </script>
