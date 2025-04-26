@@ -19,9 +19,9 @@
       box-shadow: 0 0 12px rgba(0,0,0,0.05);
       width: 100%;
       max-width: 420px;
+      text-align: center;
     }
     h2 {
-      text-align: center;
       color: #8b5e3c;
       margin-bottom: 30px;
     }
@@ -31,6 +31,7 @@
       margin-bottom: 6px;
       color: #5b3e2b;
       font-weight: bold;
+      text-align: left;
     }
     input, select {
       width: 100%;
@@ -58,20 +59,6 @@
     button:hover {
       background-color: #b89275;
     }
-    #result {
-      margin-top: 20px;
-      font-size: 14px;
-      background: #f7f3ee;
-      padding: 10px;
-      border: 1px solid #d7c7b8;
-      border-radius: 6px;
-      word-break: break-word;
-    }
-    #copyBtn {
-      display: none;
-      background-color: #9f826c;
-      margin-top: 10px;
-    }
   </style>
 </head>
 <body>
@@ -95,10 +82,7 @@
       <option value="2" selected>外帶</option>
     </select>
 
-    <button onclick="generateLinks()">🎯 產生三組問卷連結</button>
-
-    <div id="result"></div>
-    <button id="copyBtn" onclick="copyLinks()">📋 複製全部連結</button>
+    <button onclick="generateAndCopy()">🎯 一鍵產生並複製問卷連結</button>
   </div>
 
   <script>
@@ -134,34 +118,22 @@
       return `https://customer.kfc-listens.com/jfe/form/SV_1R1VSPEYVPlV1JA?Q_EED=${q_eed}`;
     }
 
-    function generateLinks() {
+    function generateAndCopy() {
       const store = document.getElementById('store').value.trim().toUpperCase();
       const o = document.getElementById('o').value;
       const k = document.getElementById('k').value;
 
       if (!store || store.length < 1 || store.length > 3) {
-        alert("請輸入正確門市代碼！");
+        alert("❗請輸入正確門市代碼！");
         return;
       }
 
-      let linksHTML = "";
-      let linksArray = [];
+      const link = generateSingleLink(store, o, k);
 
-      for (let i = 0; i < 3; i++) {
-        const link = generateSingleLink(store, o, k);
-        linksHTML += `<div><strong>🔗 問卷連結 ${i+1}：</strong><br><a href="${link}" target="_blank">${link}</a></div><br>`;
-        linksArray.push(link);
-      }
-
-      document.getElementById('result').innerHTML = linksHTML;
-      document.getElementById('copyBtn').style.display = 'block';
-      document.getElementById('copyBtn').setAttribute('data-links', linksArray.join('\n'));
-    }
-
-    function copyLinks() {
-      const linksText = document.getElementById('copyBtn').getAttribute('data-links');
-      navigator.clipboard.writeText(linksText).then(() => {
-        alert('✅ 全部問卷連結已複製到剪貼簿！');
+      navigator.clipboard.writeText(link).then(() => {
+        alert('✅ 問卷連結已成功產生並複製到剪貼簿！');
+      }).catch(() => {
+        alert('⚠️ 無法複製到剪貼簿，請手動複製！');
       });
     }
   </script>
