@@ -2,141 +2,75 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>問卷連結產生器</title>
-  <style>
-    body {
-      font-family: "Microsoft JhengHei", sans-serif;
-      background-color: #fdf8f3;
-      display: flex;
-      justify-content: center;
-      padding: 30px;
-    }
-    .container {
-      background-color: #fffaf2;
-      padding: 30px 25px;
-      border-radius: 12px;
-      box-shadow: 0 0 12px rgba(0,0,0,0.05);
-      width: 100%;
-      max-width: 420px;
-      text-align: center;
-    }
-    h2 {
-      color: #8b5e3c;
-      margin-bottom: 30px;
-    }
-    label {
-      display: block;
-      margin-top: 16px;
-      margin-bottom: 6px;
-      color: #5b3e2b;
-      font-weight: bold;
-      text-align: left;
-    }
-    input, select {
-      width: 100%;
-      padding: 12px;
-      font-size: 16px;
-      font-weight: bold;
-      color: #000;
-      background-color: #fffdf9;
-      border: 1px solid #decfc1;
-      border-radius: 6px;
-      box-sizing: border-box;
-    }
-    button {
-      width: 100%;
-      padding: 14px;
-      margin-top: 30px;
-      font-size: 16px;
-      background-color: #c8a68a;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    button:hover {
-      background-color: #b89275;
-    }
-  </style>
 </head>
 <body>
-
   <div class="container">
     <h2>問卷連結產生器</h2>
 
     <label for="store">門市代碼</label>
-    <input type="text" id="store" maxlength="3" value="226" />
+    <input type="text" id="store" maxlength="3" placeholder="請輸入 3 碼門市代碼" value="226" />
 
     <label for="o">點餐方式</label>
     <select id="o">
-      <option value="2">櫃檯</option>
+      <option value="2">網路訂餐</option>
       <option value="3">點餐機</option>
-      <option value="4" selected>網訂</option>
+      <option value="4" selected>現場訂餐</option>
     </select>
 
-    <label for="k">訂購方式</label>
-    <select id="k">
-      <option value="1">內用</option>
-      <option value="2" selected>外帶</option>
+    <label for="m">用餐方式</label>
+    <select id="m">
+      <option value="2">內用</option>
+      <option value="4" selected>外帶</option>
     </select>
 
-    <button onclick="generateAndCopy()">🎯 一鍵產生並複製問卷連結</button>
+    <br /><br />
+    <button onclick="generateAndCopy()"> 🚀一鍵產生並複製問卷連結 </button>
   </div>
 
   <script>
-    function generateSingleLink(store, o, k) {
-      const prefix = store.startsWith('5') ? 'TWB' : 'TWI';
-      const now = new Date();
-      const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
-      const D = date.toISOString().slice(0, 10).replace(/-/g, '');
-      const H = String(Math.floor(Math.random() * (22 - 10 + 1)) + 10).padStart(2, '0');
-      const rand1 = String(Math.floor(Math.random() * 90) + 10);
-      const rand2 = String(Math.floor(Math.random() * 50) + 10);
-      const rand3 = String(Math.floor(Math.random() * 89) + 11);
-      const U = `${prefix}${store}${D}${H}${rand1}${rand2}${rand3}`;
-      const T = `${H}${String(Math.floor(Math.random() * 60)).padStart(2, '0')}${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`;
-
-      const data = {
-        S: `886K${prefix}${store}`,
-        U,
-        D,
-        T,
-        Country: "TW",
-        O: o,
-        M: "2",
-        K: k,
-        I: "2"
-      };
-
-      const q_eed = btoa(JSON.stringify(data))
-        .replace(/\+/g, "-")
-        .replace(/\//g, "_")
-        .replace(/=+$/, "");
-
-      return `https://customer.kfc-listens.com/jfe/form/SV_1R1VSPEYVPlV1JA?Q_EED=${q_eed}`;
-    }
-
     function generateAndCopy() {
-      const store = document.getElementById('store').value.trim().toUpperCase();
+      const store = document.getElementById('store').value.trim();
       const o = document.getElementById('o').value;
-      const k = document.getElementById('k').value;
+      const m = document.getElementById('m').value;
+      const k = "2"; // 固定安全值
 
-      if (!store || store.length < 1 || store.length > 3) {
-        alert("❗請輸入正確門市代碼！");
+      if (!store || store.length !== 3 || isNaN(store)) {
+        alert("請輸入有效的 3 碼門市代碼");
         return;
       }
 
-      const link = generateSingleLink(store, o, k);
+      const prefix = store.startsWith('5') ? 'TWB' : 'TWI';
+      const now = new Date();
+      const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+      const d = date.toISOString().slice(0, 10).replace(/-/g, '');
+
+      const s = String(Math.floor(Math.random() * (22 - 10 + 1)) + 10).padStart(2, '0');
+      const rand1 = String(Math.floor(Math.random() * 90) + 10);
+      const rand2 = String(Math.floor(Math.random() * 50) + 10);
+      const rand3 = String(Math.floor(Math.random() * 89) + 11);
+      const u = `${prefix}${store}${d}${s}${rand1}${rand2}${rand3}`;
+
+      const t = `${s}${String(Math.floor(Math.random() * 60)).padStart(2, '0')}${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`;
+
+      const obj = {
+        S: `886K${prefix}${store}`,
+        U: u,
+        D: d,
+        T: t,
+        Country: "TW",
+        O: o,
+        M: m,
+        K: k
+      };
+
+      const base64 = btoa(JSON.stringify(obj));
+      const link = `https://customer.kfc-listens.com/jfe/form/SV_1R1VSPEYVPlV1JA?Q_EED=${base64}`;
 
       navigator.clipboard.writeText(link).then(() => {
-        alert('✅ 問卷連結已成功產生並複製到剪貼簿。');
-      }).catch(() => {
-        alert('⚠️ 無法複製到剪貼簿，請手動複製。');
+        alert("問卷連結已複製！");
       });
     }
   </script>
-
 </body>
 </html>
