@@ -62,17 +62,17 @@
     <h2>問卷連結產生器</h2>
 
     <label for="store">門市代碼</label>
-    <input type="text" id="store" maxlength="3" placeholder="請輸入門市代碼" value="226" />
+    <input type="text" id="store" maxlength="3" placeholder="請輸入門市代碼" value="" />
 
-    <label for="mode">用餐模式</label>
-    <select id="mode" onchange="lockChannelIfDelivery()">
+    <label for="mealType">用餐型態</label>
+    <select id="mealType" onchange="onMealTypeChange()">
       <option value="1">內用</option>
       <option value="2">外帶</option>
-      <option value="delivery">外送</option>
+      <option value="4">外送</option>
     </select>
 
-    <label for="channel">點餐方式</label>
-    <select id="channel">
+    <label for="orderType">點餐方式</label>
+    <select id="orderType">
       <option value="2">櫃台</option>
       <option value="3">點餐機</option>
       <option value="4">網訂</option>
@@ -82,28 +82,22 @@
   </div>
 
   <script>
-    function lockChannelIfDelivery() {
-      const mode = document.getElementById('mode').value;
-      const channel = document.getElementById('channel');
-      if (mode === "delivery") {
-        channel.value = "4";
-        channel.disabled = true;
+    function onMealTypeChange() {
+      const mealType = document.getElementById('mealType').value;
+      const orderType = document.getElementById('orderType');
+      if (mealType === '4') { // 外送
+        orderType.value = '4';
+        orderType.disabled = true;
       } else {
-        channel.disabled = false;
+        orderType.disabled = false;
       }
     }
 
     function generateAndCopy() {
       const store = document.getElementById('store').value.trim();
-      const mode = document.getElementById('mode').value;
-      const o = document.getElementById('channel').value;
-
-      let k;
-      if (mode === "delivery") {
-        k = "2";
-      } else {
-        k = mode;
-      }
+      const o = document.getElementById('orderType').value;
+      const k = document.getElementById('mealType').value;
+      const m = k === '4' ? '1' : '2'; // 外送用 M=1，其他用 M=2
 
       if (!store || store.length !== 3 || isNaN(store)) {
         alert("請輸入門市代碼");
@@ -115,13 +109,15 @@
       const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
       const d = date.toISOString().slice(0, 10).replace(/-/g, '');
 
-      const s = String(Math.floor(Math.random() * (22 - 10 + 1)) + 10).padStart(2, '0');
-      const rand1 = String(Math.floor(Math.random() * 90) + 10);
-      const rand2 = String(Math.floor(Math.random() * 50) + 10);
-      const rand3 = String(Math.floor(Math.random() * 89) + 11);
-      const u = `${prefix}${store}${d}${s}${rand1}${rand2}${rand3}`;
+      let randTail;
+      if (k === '4') {
+        randTail = '0004'; // 外送尾碼固定為會觸發題組的數值
+      } else {
+        randTail = '0053'; // 一組經驗證不會觸發外送的尾碼
+      }
 
-      const t = `${s}${String(Math.floor(Math.random() * 60)).padStart(2, '0')}${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`;
+      const u = `${prefix}${store}${d}${randTail}`;
+      const t = randTail.slice(0, 4);
 
       const obj = {
         S: `886K${prefix}${store}`,
@@ -130,7 +126,7 @@
         T: t,
         Country: "TW",
         O: o,
-        M: 1,
+        M: m,
         K: k
       };
 
@@ -138,7 +134,7 @@
       const link = `https://customer.kfc-listens.com/jfe/form/SV_1R1VSPEYVPlV1JA?Q_EED=${base64}`;
 
       navigator.clipboard.writeText(link).then(() => {
-        alert("問卷連結已複製！");
+        alert("問卷連結已複製！\n\n" + link);
       });
     }
   </script>
