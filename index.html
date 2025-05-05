@@ -7,7 +7,7 @@
   <style>
     body {
       font-family: "Microsoft JhengHei", sans-serif;
-      background-color: #fdf8f3; /* 奶茶底 */
+      background-color: #fdf8f3;
       display: flex;
       justify-content: center;
       padding: 30px;
@@ -62,19 +62,17 @@
     <h2>問卷連結產生器</h2>
 
     <label for="store">門市代碼</label>
-    <input type="text" id="store" maxlength="3" placeholder="請輸入 3 碼門市代碼" value="226" />
+    <input type="text" id="store" maxlength="3" placeholder="請輸入門市代碼" value="226" />
 
-    <label for="o">點餐方式</label>
-    <select id="o">
-      <option value="2">網訂</option>
-      <option value="3">點餐機</option>
-      <option value="4" selected>現場</option>
-    </select>
-
-    <label for="m">用餐方式</label>
-    <select id="m">
-      <option value="2">內用</option>
-      <option value="4" selected>外帶</option>
+    <label for="type">選擇類型</label>
+    <select id="type">
+      <option value="2_1">櫃台內用</option>
+      <option value="2_2">櫃台外帶</option>
+      <option value="3_1">點餐機內用</option>
+      <option value="3_2">點餐機外帶</option>
+      <option value="4_1">網訂內用</option>
+      <option value="4_2">網訂外帶</option>
+      <option value="4_2_delivery">網訂外送</option>
     </select>
 
     <button onclick="generateAndCopy()">🚀一鍵產生並複製問卷連結</button>
@@ -83,12 +81,18 @@
   <script>
     function generateAndCopy() {
       const store = document.getElementById('store').value.trim();
-      const o = document.getElementById('o').value;
-      const m = document.getElementById('m').value;
-      const k = "2"; // 固定安全值
+      const typeValue = document.getElementById('type').value;
+
+      let o, k;
+      if (typeValue === "4_2_delivery") {
+        o = "4";
+        k = "2";
+      } else {
+        [o, k] = typeValue.split('_');
+      }
 
       if (!store || store.length !== 3 || isNaN(store)) {
-        alert("請輸入有效的 3 碼門市代碼");
+        alert("請輸入門市代碼");
         return;
       }
 
@@ -112,7 +116,7 @@
         T: t,
         Country: "TW",
         O: o,
-        M: m,
+        M: 1,
         K: k
       };
 
