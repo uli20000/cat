@@ -64,31 +64,45 @@
     <label for="store">門市代碼</label>
     <input type="text" id="store" maxlength="3" placeholder="請輸入門市代碼" value="226" />
 
-    <label for="type">選擇類型</label>
-    <select id="type">
-      <option value="2_1">櫃台內用</option>
-      <option value="2_2">櫃台外帶</option>
-      <option value="3_1">點餐機內用</option>
-      <option value="3_2">點餐機外帶</option>
-      <option value="4_1">網訂內用</option>
-      <option value="4_2">網訂外帶</option>
-      <option value="4_2_delivery">網訂外送</option>
+    <label for="mode">用餐模式</label>
+    <select id="mode" onchange="lockChannelIfDelivery()">
+      <option value="1">內用</option>
+      <option value="2">外帶</option>
+      <option value="delivery">外送</option>
+    </select>
+
+    <label for="channel">點餐方式</label>
+    <select id="channel">
+      <option value="2">櫃台</option>
+      <option value="3">點餐機</option>
+      <option value="4">網訂</option>
     </select>
 
     <button onclick="generateAndCopy()">🚀一鍵產生並複製問卷連結</button>
   </div>
 
   <script>
+    function lockChannelIfDelivery() {
+      const mode = document.getElementById('mode').value;
+      const channel = document.getElementById('channel');
+      if (mode === "delivery") {
+        channel.value = "4";
+        channel.disabled = true;
+      } else {
+        channel.disabled = false;
+      }
+    }
+
     function generateAndCopy() {
       const store = document.getElementById('store').value.trim();
-      const typeValue = document.getElementById('type').value;
+      const mode = document.getElementById('mode').value;
+      const o = document.getElementById('channel').value;
 
-      let o, k;
-      if (typeValue === "4_2_delivery") {
-        o = "4";
+      let k;
+      if (mode === "delivery") {
         k = "2";
       } else {
-        [o, k] = typeValue.split('_');
+        k = mode;
       }
 
       if (!store || store.length !== 3 || isNaN(store)) {
