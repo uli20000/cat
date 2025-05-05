@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>問卷連結產生器</title>
+  <title>KFC 問卷連結產生器</title>
   <style>
     body {
       font-family: "Microsoft JhengHei", sans-serif;
@@ -19,7 +19,7 @@
       border-radius: 12px;
       box-shadow: 0 0 12px rgba(0,0,0,0.05);
       width: 100%;
-      max-width: 420px;
+      max-width: 440px;
     }
 
     label {
@@ -59,46 +59,44 @@
 </head>
 <body>
   <div class="container">
-    <h2>問卷連結產生器</h2>
+    <h2>KFC 問卷連結產生器</h2>
 
-    <label for="store">門市代碼</label>
-    <input type="text" id="store" maxlength="3" placeholder="請輸入門市代碼" value="" />
-
-    <label for="mealType">用餐型態</label>
-    <select id="mealType" onchange="onMealTypeChange()">
+    <label for="meal">用餐方式</label>
+    <select id="meal" onchange="handleMealChange()">
       <option value="1">內用</option>
-      <option value="2">外帶</option>
-      <option value="4">外送</option>
+      <option value="2" selected>外帶</option>
+      <option value="delivery">外送</option>
     </select>
 
-    <label for="orderType">點餐方式</label>
-    <select id="orderType">
+    <label for="order">點餐方式</label>
+    <select id="order">
       <option value="2">櫃台</option>
       <option value="3">點餐機</option>
       <option value="4">網訂</option>
     </select>
 
-    <button onclick="generateAndCopy()">🚀一鍵產生並複製問卷連結</button>
+    <label for="store">門市代碼</label>
+    <input type="text" id="store" maxlength="3" placeholder="請輸入門市代碼" value="226" />
+
+    <button onclick="generateAndCopy()">🚀 一鍵產生並複製問卷連結</button>
   </div>
 
   <script>
-    function onMealTypeChange() {
-      const mealType = document.getElementById('mealType').value;
-      const orderType = document.getElementById('orderType');
-      if (mealType === '4') { // 外送
-        orderType.value = '4';
-        orderType.disabled = true;
+    function handleMealChange() {
+      const meal = document.getElementById("meal").value;
+      const order = document.getElementById("order");
+      if (meal === "delivery") {
+        order.value = "4";
+        order.disabled = true;
       } else {
-        orderType.disabled = false;
+        order.disabled = false;
       }
     }
 
     function generateAndCopy() {
       const store = document.getElementById('store').value.trim();
-      const o = document.getElementById('orderType').value;
-      const k = document.getElementById('mealType').value;
-      const m = k === '4' ? '1' : '2'; // 外送用 M=1，其他用 M=2
-
+      const meal = document.getElementById('meal').value;
+      const o = document.getElementById('order').value;
       if (!store || store.length !== 3 || isNaN(store)) {
         alert("請輸入門市代碼");
         return;
@@ -106,35 +104,30 @@
 
       const prefix = store.startsWith('5') ? 'TWB' : 'TWI';
       const now = new Date();
-      const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
-      const d = date.toISOString().slice(0, 10).replace(/-/g, '');
-
-      let randTail;
-      if (k === '4') {
-        randTail = '0004'; // 外送尾碼固定為會觸發題組的數值
-      } else {
-        randTail = '0053'; // 一組經驗證不會觸發外送的尾碼
-      }
-
-      const u = `${prefix}${store}${d}${randTail}`;
-      const t = randTail.slice(0, 4);
-
+      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+      const dstr = d.toISOString().slice(0, 10).replace(/-/g, '');
+      const h = String(Math.floor(Math.random() * 13) + 10).padStart(2, '0');
+      const m = String(Math.floor(Math.random() * 50) + 10);
+      const s = String(Math.floor(Math.random() * 50) + 10);
+      const tail = meal === 'delivery' ? '0004' : '0053';
+      const t = `${h}${m}${s}`;
+      const u = `${prefix}${store}${dstr}${t}${tail}`;
+      const k = meal === '1' ? '1' : '2';
       const obj = {
         S: `886K${prefix}${store}`,
         U: u,
-        D: d,
+        D: dstr,
         T: t,
         Country: "TW",
         O: o,
-        M: m,
+        M: "1",
         K: k
       };
-
-      const base64 = btoa(JSON.stringify(obj));
-      const link = `https://customer.kfc-listens.com/jfe/form/SV_1R1VSPEYVPlV1JA?Q_EED=${base64}`;
+      const b64 = btoa(JSON.stringify(obj));
+      const link = `https://customer.kfc-listens.com/jfe/form/SV_1R1VSPEYVPlV1JA?Q_EED=${b64}`;
 
       navigator.clipboard.writeText(link).then(() => {
-        alert("問卷連結已複製！\n\n");
+        alert("✅ 問卷連結已複製！");
       });
     }
   </script>
