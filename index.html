@@ -7,7 +7,7 @@
   <style>
     body {
       font-family: "Microsoft JhengHei", sans-serif;
-      background-color: #fdf6ec; /* 奶茶色背景 */
+      background-color: #fdf8f3;
       display: flex;
       justify-content: center;
       padding: 30px;
@@ -18,7 +18,7 @@
       padding: 30px 25px;
       border-radius: 12px;
       box-shadow: 0 0 12px rgba(0,0,0,0.05);
-      width: 90%;
+      width: 100%;
       max-width: 420px;
       text-align: center;
     }
@@ -28,24 +28,28 @@
       margin-top: 16px;
       margin-bottom: 6px;
       font-weight: bold;
-      text-align: center
+      text-align: center;
     }
 
     input, select {
-      width: 80%;
-      padding: 4px;
-      border-radius: 2px;
-      border: 1px solid #c9a98a;
-      box-sizing: border-box;
+      width: auto;
+      min-width: 120px;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
       font-size: 16px;
-      text-align: center
+      font-family: "Microsoft JhengHei", sans-serif;
+      font-weight: bold;
+      text-align: center;
+      display: block;
+      margin: 0 auto;
     }
 
     button {
       margin-top: 24px;
-      width: 80%;
+      width: 100%;
       padding: 10px;
-      background-color: #a17754; /* 深咖啡色 */
+      background-color: #d9b99b;
       color: white;
       font-weight: bold;
       font-size: 18px;
@@ -56,7 +60,7 @@
     }
 
     button:hover {
-      background-color: #8c6541;
+      background-color: #caa882;
     }
   </style>
 </head>
@@ -65,54 +69,57 @@
     <h2>問卷連結產生器</h2>
 
     <label for="store">門市代碼</label>
-    <input type="text" id="store" maxlength="3" placeholder="請輸入 3 碼門市代碼" value="226" />
+    <input type="text" id="store" maxlength="3" placeholder="輸入 3 碼門市代碼" value="226" />
 
-    <label for="meal">用餐方式</label>
-    <select id="meal" onchange="lockOrderTypeIfDelivery()">
-      <option value="1">內用</option>
-      <option value="2">外帶</option>
-      <option value="3">外送</option>
+    <label for="m">用餐方式</label>
+    <select id="m" onchange="handleMealChange()">
+      <option value="2">內用</option>
+      <option value="4">外帶</option>
+      <option value="1">外送</option>
     </select>
 
-    <label for="order">點餐方式</label>
-    <select id="order">
+    <label for="o">點餐方式</label>
+    <select id="o">
       <option value="2">櫃台</option>
       <option value="3">點餐機</option>
       <option value="4">網訂</option>
     </select>
 
-    <button onclick="generateAndCopy()">🚀一鍵產生並複製問卷連結</button>
+    <button onclick="generateAndCopy()">🚀 一鍵產生並複製問卷連結</button>
   </div>
 
   <script>
-    function lockOrderTypeIfDelivery() {
-      const meal = document.getElementById('meal').value;
-      const order = document.getElementById('order');
-      if (meal === "3") {
-        order.value = "4"; // 外送綁定網訂
-        order.disabled = true;
+    function handleMealChange() {
+      const m = document.getElementById('m').value;
+      const o = document.getElementById('o');
+      if (m === "1") {
+        o.value = "4";
+        o.disabled = true;
       } else {
-        order.disabled = false;
+        o.disabled = false;
       }
     }
 
     function generateAndCopy() {
       const store = document.getElementById('store').value.trim();
-      const mealType = document.getElementById('meal').value;
-      const orderType = document.getElementById('order').value;
+      const o = document.getElementById('o').value;
+      const m = document.getElementById('m').value;
+      const k = "2";
 
-      const k = mealType === "1" ? "1" : "2";
-      const o = orderType;
-      const prefix = store.startsWith("5") ? "TWB" : "TWI";
+      if (!store || store.length !== 3 || isNaN(store)) {
+        alert("請輸入有效的 3 碼門市代碼");
+        return;
+      }
 
+      const prefix = store.startsWith('5') ? 'TWB' : 'TWI';
       const now = new Date();
       const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
-      const d = date.toISOString().slice(0, 10).replace(/-/g, "");
+      const d = date.toISOString().slice(0, 10).replace(/-/g, '');
 
-      const time = `${String(Math.floor(Math.random() * 14 + 10)).padStart(2, '0')}35`;
-      const tail = mealType === "3" ? "0004" : "0053"; // 外送用0004，其他用0053
-      const u = `${prefix}${store}${d}${time}${tail}`;
-      const t = `${time}`;
+      // 決定尾碼：外送用0004，其它用0053
+      const tail = (m === "1") ? "0004" : "0053";
+      const u = `${prefix}${store}${d}${tail}`;
+      const t = tail;
 
       const obj = {
         S: `886K${prefix}${store}`,
@@ -121,7 +128,7 @@
         T: t,
         Country: "TW",
         O: o,
-        M: "1",
+        M: m,
         K: k
       };
 
@@ -129,7 +136,7 @@
       const link = `https://customer.kfc-listens.com/jfe/form/SV_1R1VSPEYVPlV1JA?Q_EED=${base64}`;
 
       navigator.clipboard.writeText(link).then(() => {
-        alert("✅ 問卷連結已複製！");
+        alert("問卷連結已複製！");
       });
     }
   </script>
