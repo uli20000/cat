@@ -1,3 +1,6 @@
+from IPython.display import display, HTML
+
+html_code = """
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -32,8 +35,7 @@
     }
 
     input, select {
-      width: auto;
-      min-width: 120px;
+      width: 200px;
       padding: 8px;
       border-radius: 6px;
       border: 1px solid #ccc;
@@ -116,7 +118,6 @@
       const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
       const d = date.toISOString().slice(0, 10).replace(/-/g, '');
 
-      // 決定尾碼：外送用0004，其它用0053
       const tail = (m === "1") ? "0004" : "0053";
       const u = `${prefix}${store}${d}${tail}`;
       const t = tail;
@@ -142,3 +143,6 @@
   </script>
 </body>
 </html>
+"""
+
+display(HTML(html_code))
