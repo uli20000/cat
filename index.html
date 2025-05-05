@@ -23,12 +23,17 @@
       text-align: center;
     }
 
+    h2 {
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 24px;
+    }
+
     label {
       display: block;
       margin-top: 16px;
       margin-bottom: 6px;
       font-weight: bold;
-      text-align: center;
     }
 
     input, select {
@@ -37,11 +42,10 @@
       border-radius: 6px;
       border: 1px solid #ccc;
       font-size: 16px;
+      text-align: center;
+      box-sizing: border-box;
       font-family: "Microsoft JhengHei", sans-serif;
       font-weight: bold;
-      text-align: center;
-      display: block;
-      margin: 0 auto;
     }
 
     button {
@@ -68,42 +72,43 @@
     <h2>問卷連結產生器</h2>
 
     <label for="store">門市代碼</label>
-    <input type="text" id="store" maxlength="3" placeholder="輸入 3 碼門市代碼" value="226" />
+    <input type="text" id="store" maxlength="3" placeholder="請輸入 3 碼門市代碼" value="226" />
 
-    <label for="m">用餐方式</label>
-    <select id="m" onchange="handleMealChange()">
+    <label for="meal">用餐方式</label>
+    <select id="meal" onchange="handleMealChange()">
       <option value="2">內用</option>
-      <option value="4">外帶</option>
+      <option value="4" selected>外帶</option>
       <option value="1">外送</option>
     </select>
 
-    <label for="o">點餐方式</label>
-    <select id="o">
+    <label for="order">點餐方式</label>
+    <select id="order">
       <option value="2">櫃台</option>
       <option value="3">點餐機</option>
       <option value="4">網訂</option>
     </select>
 
-    <button onclick="generateAndCopy()">🚀 一鍵產生並複製問卷連結</button>
+    <button onclick="generateAndCopy()">🚀一鍵產生並複製問卷連結</button>
   </div>
 
   <script>
     function handleMealChange() {
-      const m = document.getElementById('m').value;
-      const o = document.getElementById('o');
-      if (m === "1") {
-        o.value = "4";
-        o.disabled = true;
+      const meal = document.getElementById('meal').value;
+      const order = document.getElementById('order');
+      if (meal === '1') {
+        order.value = '4';
+        order.disabled = true;
       } else {
-        o.disabled = false;
+        order.disabled = false;
       }
     }
 
     function generateAndCopy() {
       const store = document.getElementById('store').value.trim();
-      const o = document.getElementById('o').value;
-      const m = document.getElementById('m').value;
-      const k = "2";
+      const m = document.getElementById('meal').value;
+      const o = document.getElementById('order').value;
+      const k = (m === '1') ? "1" : "2"; // 外送固定K=1，其餘K=2
+      const tail = (m === '1') ? "0004" : "0053";
 
       if (!store || store.length !== 3 || isNaN(store)) {
         alert("請輸入有效的 3 碼門市代碼");
@@ -114,10 +119,8 @@
       const now = new Date();
       const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
       const d = date.toISOString().slice(0, 10).replace(/-/g, '');
-
-      const tail = (m === "1") ? "0004" : "0053";
-      const u = `${prefix}${store}${d}${tail}`;
-      const t = tail;
+      const t = "133000";
+      const u = `${prefix}${store}${d}${t}${tail}`;
 
       const obj = {
         S: `886K${prefix}${store}`,
