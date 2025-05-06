@@ -107,8 +107,7 @@
       const store = document.getElementById('store').value.trim();
       const m = document.getElementById('meal').value;
       const o = document.getElementById('order').value;
-      const k = (m === '1') ? "1" : "2"; // 外送固定K=1，其餘K=2
-      const tail = (m === '1') ? "0004" : "0053";
+      const k = (m === '1') ? "1" : "2";
 
       if (!store || store.length !== 3 || isNaN(store)) {
         alert("請輸入有效的 3 碼門市代碼");
@@ -120,6 +119,9 @@
       const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
       const d = date.toISOString().slice(0, 10).replace(/-/g, '');
       const t = "133000";
+
+      const safeTails = ["0053", "0041", "0026", "0057", "0035", "0029"];
+      const tail = (m === '1') ? "0004" : safeTails[Math.floor(Math.random() * safeTails.length)];
       const u = `${prefix}${store}${d}${t}${tail}`;
 
       const obj = {
