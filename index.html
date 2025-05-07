@@ -2,54 +2,61 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>KFC 問卷連結產生器</title>
   <style>
     body {
       font-family: "Microsoft JhengHei", sans-serif;
-      background-color: #f3e8dc;
+      background-color: #fdf3e7;
       display: flex;
       justify-content: center;
-      padding: 30px;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
     }
+
     .container {
       background-color: #fffaf2;
       padding: 30px 25px;
       border-radius: 12px;
-      box-shadow: 0 0 12px rgba(0,0,0,0.05);
-      width: 100%;
-      max-width: 460px;
-      text-align: center;
+      box-shadow: 0 0 15px rgba(0,0,0,0.08);
+      width: 50%;
+      min-width: 400px;
+      box-sizing: border-box;
     }
+
     h2 {
       font-size: 24px;
-      font-weight: bold;
-      color: #5c4436;
+      text-align: center;
       margin-bottom: 20px;
+      font-weight: bold;
+      color: #6b4c3b;
     }
+
     label {
       display: block;
       margin-top: 16px;
       margin-bottom: 6px;
       font-weight: bold;
-      color: #5c4436;
+      color: #5e3d29;
     }
+
     input, select {
-      width: 80%;
+      width: 100%;
       padding: 8px;
-      margin: auto;
-      font-size: 16px;
-      font-weight: bold;
-      text-align: center;
       border-radius: 6px;
-      border: 1px solid #b59b84;
-      background-color: #fcf6f0;
-      display: block;
+      border: 1px solid #c8b09c;
+      font-size: 16px;
+      text-align: center;
+      font-weight: bold;
+      box-sizing: border-box;
     }
+
     button {
       margin-top: 24px;
       width: 100%;
       padding: 12px;
-      background-color: #d9b99b;
+      background-color: #c8a57d;
       color: white;
       font-weight: bold;
       font-size: 18px;
@@ -58,8 +65,9 @@
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
+
     button:hover {
-      background-color: #caa882;
+      background-color: #b8946f;
     }
   </style>
 </head>
@@ -68,62 +76,60 @@
     <h2>KFC 問卷連結產生器</h2>
 
     <label for="store">門市代碼</label>
-    <input type="text" id="store" maxlength="3" placeholder="226" />
+    <input type="text" id="store" maxlength="3" placeholder="例如：209" />
 
-    <label for="type">用餐方式</label>
-    <select id="type" onchange="lockMethodIfDelivery()">
+    <label for="m">用餐方式</label>
+    <select id="m" onchange="toggleOrderOption()">
       <option value="1">內用</option>
       <option value="2">外帶</option>
       <option value="4">外送</option>
     </select>
 
-    <label for="method">點餐方式</label>
-    <select id="method">
+    <label for="o">點餐方式</label>
+    <select id="o">
       <option value="2">櫃台</option>
       <option value="3">點餐機</option>
       <option value="4">網訂</option>
     </select>
 
-    <button onclick="generateAndCopy()">🚀 產生並複製問卷連結</button>
+    <button onclick="generateAndCopy()">🚀 一鍵產生並複製問卷連結</button>
   </div>
 
   <script>
-    const safeNormalTails = ["10050001", "14480005", "13350004", "12230003"];
-    const safeDeliveryTails = ["18600010", "10050001", "14480005", "13350004"];
+    const normalTail = ['13350004', '12230003', '18600010', '114646', '114241', '114126'];
+    const deliveryTail = ['10050001', '14480005', '13350004', '12230003', '18600010'];
 
-    function lockMethodIfDelivery() {
-      const type = document.getElementById('type').value;
-      const method = document.getElementById('method');
-      if (type === "4") {
-        method.value = "4";
-        method.disabled = true;
+    function toggleOrderOption() {
+      const m = document.getElementById('m').value;
+      const o = document.getElementById('o');
+      if (m === '4') {
+        o.value = '4';
+        o.disabled = true;
       } else {
-        method.disabled = false;
+        o.disabled = false;
       }
     }
 
     function generateAndCopy() {
       const store = document.getElementById('store').value.trim();
-      const type = document.getElementById('type').value;
-      const method = document.getElementById('method').value;
+      const m = document.getElementById('m').value;
+      const o = document.getElementById('o').value;
       const k = "2";
-      const prefix = store.startsWith('5') ? 'TWB' : 'TWI';
 
       if (!store || store.length !== 3 || isNaN(store)) {
         alert("請輸入有效的 3 碼門市代碼");
         return;
       }
 
-      const today = new Date();
-      const date = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-      const d = date.toISOString().slice(0, 10).replace(/-/g, '');
+      const prefix = store.startsWith('5') ? 'TWB' : 'TWI';
+      const now = new Date();
+      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1).toISOString().slice(0, 10).replace(/-/g, '');
 
-      const s = String(Math.floor(Math.random() * 13 + 10)); // s：10-22
-      const randTail = (type === "4" ? safeDeliveryTails : safeNormalTails);
-      const uTail = randTail[Math.floor(Math.random() * randTail.length)];
+      // 隨機尾碼（根據是否為外送）
+      const uTail = (m === '4' ? deliveryTail : normalTail)[Math.floor(Math.random() * (m === '4' ? deliveryTail.length : normalTail.length))];
 
       const u = `${prefix}${store}${d}${uTail}`;
-      const t = `${s}${String(Math.floor(Math.random() * 60)).padStart(2, '0')}${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`;
+      const t = uTail;
 
       const obj = {
         S: `886K${prefix}${store}`,
@@ -131,8 +137,8 @@
         D: d,
         T: t,
         Country: "TW",
-        O: method,
-        M: type,
+        O: o,
+        M: m,
         K: k
       };
 
@@ -140,7 +146,7 @@
       const link = `https://customer.kfc-listens.com/jfe/form/SV_1R1VSPEYVPlV1JA?Q_EED=${base64}`;
 
       navigator.clipboard.writeText(link).then(() => {
-        alert("✅ 問卷連結已複製！");
+        alert("問卷連結已複製！");
       });
     }
   </script>
