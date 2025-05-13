@@ -188,8 +188,8 @@
 
       if (mealValue === "外送") {
         // 外送邏輯
-        m = "2";  // 外帶標記，觸發外送題組
-        k = "1";  // 固定為 1，搭配外送成功範例
+        m = "1";  // 外帶標記，觸發外送題組
+        k = "2";  // 固定為 1，搭配外送成功範例
         tail = externalTailCodes[Math.floor(Math.random() * externalTailCodes.length)];
         u = `${prefix}${store}${d}${tail}`;
       } else {
