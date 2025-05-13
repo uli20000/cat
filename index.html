@@ -3,133 +3,205 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>KFC 問卷連結產生器</title>
+  <title>小工具🛠️</title>
   <style>
     body {
+      background-color: #fdf6ee;
       font-family: "Microsoft JhengHei", sans-serif;
-      background-color: #fdf3e7;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      margin: 0;
+      min-height: 100vh;
     }
 
     .container {
-      background-color: #fffaf2;
+      width: 500px;
+      height: 500px;
+      background-color: #fffaf4;
+      border-radius: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: center;
       padding: 30px 25px;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.08);
-      width: 50%;
-      min-width: 400px;
-      box-sizing: border-box;
     }
 
     h2 {
-      font-size: 24px;
-      text-align: center;
-      margin-bottom: 20px;
+      font-size: 26px;
       font-weight: bold;
-      color: #6b4c3b;
+      color: #5a3c2d;
+      margin-bottom: 30px;
     }
 
     label {
       display: block;
-      margin-top: 16px;
-      margin-bottom: 6px;
-      font-weight: bold;
-      color: #5e3d29;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 8px;
-      border-radius: 6px;
-      border: 1px solid #c8b09c;
-      font-size: 16px;
-      text-align: center;
-      font-weight: bold;
-      box-sizing: border-box;
-    }
-
-    button {
-      margin-top: 24px;
-      width: 100%;
-      padding: 12px;
-      background-color: #c8a57d;
-      color: white;
-      font-weight: bold;
+      margin-top: 18px;
       font-size: 18px;
+      font-weight: bold;
+      color: #5a3c2d;
+    }
+
+    input[type="text"] {
+      width: 90%;
+      padding: 12px;
+      font-size: 18px;
+      font-weight: bold;
+      text-align: center;
+      border-radius: 6px;
+      border: 1px solid #c9b29b;
+      margin-top: 8px;
+    }
+
+    .btn-group {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 12px;
+    }
+
+    .btn-group button {
+      flex: 1;
+      margin: 0 4px;
+      padding: 12px 0;
+      font-size: 16px;
+      font-weight: bold;
+      background-color: #e6d0b9;
+      border: none;
+      border-radius: 6px;
+      color: #000;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-group button:hover {
+      background-color: #d4b89d;
+    }
+
+    .btn-group button.active {
+      background-color: #c4a88b;
+    }
+
+    .btn-group button.disabled {
+      background-color: #eee4db;
+      color: #999;
+      cursor: not-allowed;
+    }
+
+    #generate {
+      margin-top: 42px;
+      width: 100%;
+      padding: 16px;
+      font-size: 20px;
+      font-weight: bold;
+      background-color: #b08968;
+      color: white;
       border: none;
       border-radius: 8px;
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
 
-    button:hover {
-      background-color: #b8946f;
+    #generate:hover {
+      background-color: #8d6a4a;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>KFC 問卷連結產生器</h2>
+    <h2>小工具🛠️</h2>
 
-    <label for="store">門市代碼</label>
-    <input type="text" id="store" maxlength="3" value="226"/>
+    <label>門市代碼</label>
+    <input type="text" id="store" maxlength="3" placeholder="" />
 
-    <label for="m">用餐方式</label>
-    <select id="m" onchange="toggleOrderOption()">
-      <option value="1">內用</option>
-      <option value="2">外帶</option>
-      <option value="4">外送</option>
-    </select>
+    <label>用餐方式</label>
+    <div class="btn-group" id="mealType">
+      <button onclick="selectBtn(this, 'meal')" data-value="1">內用</button>
+      <button onclick="selectBtn(this, 'meal')" data-value="4">外帶</button>
+      <button onclick="selectBtn(this, 'meal')" data-value="外送">外送</button>
+    </div>
 
-    <label for="o">點餐方式</label>
-    <select id="o">
-      <option value="2">櫃台</option>
-      <option value="3">點餐機</option>
-      <option value="4">網訂</option>
-    </select>
+    <label>點餐方式</label>
+    <div class="btn-group" id="orderType">
+      <button onclick="selectBtn(this, 'order')" data-value="3">點餐機</button>
+      <button onclick="selectBtn(this, 'order')" data-value="2">櫃檯</button>
+      <button onclick="selectBtn(this, 'order')" data-value="4">網訂</button>
+    </div>
 
-    <button onclick="generateAndCopy()">🚀 一鍵產生並複製問卷連結</button>
+    <button id="generate" onclick="generate()">🚀 一鍵複製問卷連結</button>
   </div>
 
   <script>
-    const normalTail = ['13350004', '12230003', '18600010', '114646', '114241', '114126'];
-    const deliveryTail = ['10050001', '14480005', '13350004', '12230003', '18600010'];
+    let mealValue = "";
+    let orderValue = "";
 
-    function toggleOrderOption() {
-      const m = document.getElementById('m').value;
-      const o = document.getElementById('o');
-      if (m === '4') {
-        o.value = '4';
-        o.disabled = true;
+    const externalTailCodes = ["10050001", "14480005", "13350004", "12230003", "18600010", "0001", "2001", "0004"];
+    const normalTailCodes = ["0053", "0041", "0026", "0061", "0003", "0004", "0005", "0010", "0030", "0011"];
+
+    function selectBtn(button, type) {
+      const group = type === 'meal' ? document.getElementById('mealType') : document.getElementById('orderType');
+      const buttons = group.querySelectorAll('button');
+      buttons.forEach(btn => btn.classList.remove('active'));
+      button.classList.add('active');
+
+      if (type === 'meal') {
+        mealValue = button.dataset.value;
+        const orderButtons = document.getElementById('orderType').querySelectorAll('button');
+
+        if (mealValue === "外送") {
+          // 外送時只允許網訂
+          orderButtons.forEach(btn => {
+            btn.classList.remove('active');
+            btn.classList.add('disabled');
+            if (btn.dataset.value === "4") {
+              btn.classList.add('active');
+              btn.classList.remove('disabled');
+              orderValue = "4";
+            }
+          });
+        } else {
+          // 解除禁用
+          orderButtons.forEach(btn => btn.classList.remove('disabled'));
+        }
       } else {
-        o.disabled = false;
+        if (!button.classList.contains('disabled')) {
+          orderValue = button.dataset.value;
+        }
       }
     }
 
-    function generateAndCopy() {
-      const store = document.getElementById('store').value.trim();
-      const m = document.getElementById('m').value;
-      const o = document.getElementById('o').value;
-      const k = "2";
-
+    function generate() {
+      const store = document.getElementById("store").value.trim();
       if (!store || store.length !== 3 || isNaN(store)) {
-        alert("請輸入有效的 3 碼門市代碼");
+        alert("請輸入有效門市代碼");
+        return;
+      }
+      if (!mealValue || !orderValue) {
+        alert("請選擇用餐與點餐方式");
         return;
       }
 
-      const prefix = store.startsWith('5') ? 'TWB' : 'TWI';
+      const prefix = store.startsWith("5") ? "TWB" : "TWI";
       const now = new Date();
-      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1).toISOString().slice(0, 10).replace(/-/g, '');
+      const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+      const d = date.toISOString().slice(0, 10).replace(/-/g, "");
+      const s = String(Math.floor(Math.random() * (22 - 10 + 1)) + 10).padStart(2, '0');
+      const t = `${s}${String(Math.floor(Math.random() * 60)).padStart(2, '0')}${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`;
 
-      // 隨機尾碼（根據是否為外送）
-      const uTail = (m === '4' ? deliveryTail : normalTail)[Math.floor(Math.random() * (m === '4' ? deliveryTail.length : normalTail.length))];
+      let u = "", m = "", k = "", tail = "";
 
-      const u = `${prefix}${store}${d}${uTail}`;
-      const t = uTail;
+      if (mealValue === "外送") {
+        // 外送邏輯
+        m = "2";  // 外帶標記，觸發外送題組
+        k = "1";  // 固定為 1，搭配外送成功範例
+        tail = externalTailCodes[Math.floor(Math.random() * externalTailCodes.length)];
+        u = `${prefix}${store}${d}${tail}`;
+      } else {
+        // 正常題組邏輯
+        m = mealValue;
+        k = "2";
+        const useSafe = Math.random() < 0.6;
+        tail = useSafe
+          ? normalTailCodes[Math.floor(Math.random() * normalTailCodes.length)]
+          : String(Math.floor(10000000 + Math.random() * 89999999));
+        u = `${prefix}${store}${d}${tail}`;
+      }
 
       const obj = {
         S: `886K${prefix}${store}`,
@@ -137,7 +209,7 @@
         D: d,
         T: t,
         Country: "TW",
-        O: o,
+        O: orderValue,
         M: m,
         K: k
       };
@@ -146,7 +218,7 @@
       const link = `https://customer.kfc-listens.com/jfe/form/SV_1R1VSPEYVPlV1JA?Q_EED=${base64}`;
 
       navigator.clipboard.writeText(link).then(() => {
-        alert("問卷連結已複製！");
+        alert("✅已複製成功");
       });
     }
   </script>
