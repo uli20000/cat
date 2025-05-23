@@ -6,13 +6,13 @@
   <title>小工具🛠️</title>
   <style>
     body {
-      margin: 0;
-      height: 100vh;
       background-color: #fdf6ee;
       font-family: "Microsoft JhengHei", sans-serif;
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
     }
 
     .container {
@@ -74,7 +74,7 @@
     }
 
     #generate {
-      margin-top: 42px;
+      margin-top: 36px;
       width: 100%;
       padding: 16px;
       font-size: 20px;
@@ -128,17 +128,14 @@
 
       if (type === 'meal') {
         mealValue = button.dataset.value;
-
         const orderButtons = document.getElementById('orderType').querySelectorAll('button');
         if (mealValue === "delivery") {
-          orderValue = "4"; // 強制網訂
+          orderValue = "4";
           orderButtons.forEach(btn => {
             btn.classList.remove('active');
             btn.classList.add('disabled');
             btn.disabled = true;
-            if (btn.dataset.value === "4") {
-              btn.classList.add('active');
-            }
+            if (btn.dataset.value === "4") btn.classList.add('active');
           });
         } else {
           orderButtons.forEach(btn => {
@@ -152,56 +149,60 @@
     }
 
     async function generate() {
-      let storeRaw = await navigator.clipboard.readText();
-      if (!storeRaw) return alert("剪貼板沒有門市代碼");
-      let store = storeRaw.trim();
-      if (store.length === 2) store = "0" + store;
-      if (store.length !== 3 || isNaN(store)) return alert("門市代碼格式錯誤");
+      try {
+        const storeRaw = await navigator.clipboard.readText();
+        if (!storeRaw) return alert("剪貼板沒有門市代碼");
+        let store = storeRaw.trim();
+        if (store.length === 2) store = "0" + store;
+        if (store.length !== 3 || isNaN(store)) return alert("門市代碼格式錯誤");
 
-      if (!mealValue || !orderValue) return alert("請選擇用餐與點餐方式");
+        if (!mealValue || !orderValue) return alert("請選擇用餐與點餐方式");
 
-      const prefix = store.startsWith("5") ? "TWB" : "TWI";
-      const now = new Date();
-      const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
-      const d = date.toISOString().slice(0, 10).replace(/-/g, "");
-      const s = String(Math.floor(Math.random() * 13) + 10).padStart(2, '0');
-      const t = `${s}${String(Math.floor(Math.random() * 60)).padStart(2, '0')}${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`;
+        const prefix = store.startsWith("5") ? "TWB" : "TWI";
+        const now = new Date();
+        const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+        const d = date.toISOString().slice(0, 10).replace(/-/g, "");
+        const s = String(Math.floor(Math.random() * 13) + 10).padStart(2, '0');
+        const t = `${s}${String(Math.floor(Math.random() * 60)).padStart(2, '0')}${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`;
 
-      let m, k, tail, u;
+        let m, k, tail;
+        if (mealValue === "delivery") {
+          m = "1";
+          k = "2";
+          const useSafe = Math.random() < 0.8;
+          tail = useSafe
+            ? externalTailCodes[Math.floor(Math.random() * externalTailCodes.length)]
+            : String(Math.floor(10000000 + Math.random() * 89999999));
+        } else {
+          m = mealValue;
+          k = "2";
+          const useSafe = Math.random() < 0.6;
+          tail = useSafe
+            ? normalTailCodes[Math.floor(Math.random() * normalTailCodes.length)]
+            : String(Math.floor(10000000 + Math.random() * 89999999));
+        }
 
-      if (mealValue === "delivery") {
-        m = "1"; // 固定為內用標記
-        k = "2"; // 固定為 2（安全取餐標記）
-        const useSafe = Math.random() < 0.8;
-        tail = useSafe
-          ? externalTailCodes[Math.floor(Math.random() * externalTailCodes.length)]
-          : String(Math.floor(10000000 + Math.random() * 89999999));
-      } else {
-        m = mealValue;
-        k = "2";
-        const useSafe = Math.random() < 0.6;
-        tail = useSafe
-          ? normalTailCodes[Math.floor(Math.random() * normalTailCodes.length)]
-          : String(Math.floor(10000000 + Math.random() * 89999999));
+        const u = `${prefix}${store}${d}${tail}`;
+
+        const obj = {
+          S: `886K${prefix}${store}`,
+          U: u,
+          D: d,
+          T: t,
+          Country: "TW",
+          O: orderValue,
+          M: m,
+          K: k
+        };
+
+        const base64 = btoa(JSON.stringify(obj));
+        const link = `https://customer.kfc-listens.com/jfe/form/SV_1R1VSPEYVPlV1JA?Q_EED=${base64}`;
+        await navigator.clipboard.writeText(link);
+        alert("✅ 已複製成功");
+      } catch (err) {
+        alert("❌ 複製失敗，請檢查瀏覽器是否支援剪貼板讀取功能");
+        console.error(err);
       }
-
-      u = `${prefix}${store}${d}${tail}`;
-
-      const obj = {
-        S: `886K${prefix}${store}`,
-        U: u,
-        D: d,
-        T: t,
-        Country: "TW",
-        O: orderValue,
-        M: m,
-        K: k
-      };
-
-      const base64 = btoa(JSON.stringify(obj));
-      const link = `https://customer.kfc-listens.com/jfe/form/SV_1R1VSPEYVPlV1JA?Q_EED=${base64}`;
-      await navigator.clipboard.writeText(link);
-      alert("✅ 已複製成功");
     }
   </script>
 </body>
