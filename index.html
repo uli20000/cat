@@ -18,29 +18,34 @@
 
     .container {
       width: 500px;
-      background: linear-gradient(to bottom right, #fffaf4, #fcefe1);
+      background-color: #fffaf4;
       border-radius: 20px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       text-align: center;
       padding: 30px 25px;
       box-sizing: border-box;
     }
 
-    h2 {
-      font-size: 32px;
+    .title-box {
+      display: inline-block;
+      padding: 8px 20px;
+      border: 2px solid #b08968;
+      border-radius: 12px;
+      background-color: #fff5e6;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      margin-bottom: 25px;
+    }
+
+    .title-box h2 {
+      font-size: 30px;
       font-weight: bold;
       color: #5a3c2d;
-      margin-bottom: 25px;
-      padding: 10px;
-      border: 2px solid #e0c3a5;
-      border-radius: 10px;
-      display: inline-block;
-      background-color: #fffaf2;
+      margin: 0;
     }
 
     label {
       display: block;
-      margin-top: 20px;
+      margin-top: 18px;
       font-size: 20px;
       font-weight: bold;
       color: #5a3c2d;
@@ -112,7 +117,9 @@
 </head>
 <body>
 <div class="container">
-  <h2>小工具🛠️</h2>
+  <div class="title-box">
+    <h2>小工具🛠️</h2>
+  </div>
 
   <label>門市代碼</label>
   <input type="text" id="store" maxlength="3" placeholder="請輸入3碼" />
@@ -151,7 +158,7 @@
       mealValue = button.dataset.value;
       const orderButtons = document.getElementById('orderType').querySelectorAll('button');
       if (mealValue === "delivery") {
-        orderValue = "4"; // 強制網訂
+        orderValue = "4";
         orderButtons.forEach(btn => {
           btn.classList.remove('active');
           btn.classList.add('disabled');
@@ -163,7 +170,7 @@
           btn.classList.remove('disabled');
           btn.disabled = false;
         });
-        orderValue = ""; // 等待點選
+        orderValue = "";
       }
     } else {
       if (!button.classList.contains("disabled")) {
