@@ -119,8 +119,8 @@
 
   <label>用餐方式</label>
   <div class="btn-group" id="mealType">
-    <button onclick="selectBtn(this, 'meal')" data-value="1">內用</button>
-    <button onclick="selectBtn(this, 'meal')" data-value="2">外帶</button>
+    <button onclick="selectBtn(this, 'meal')" data-value="2">內用</button>
+    <button onclick="selectBtn(this, 'meal')" data-value="4">外帶</button>
     <button onclick="selectBtn(this, 'meal')" data-value="delivery">外送</button>
   </div>
 
@@ -138,8 +138,15 @@
   let mealValue = "";
   let orderValue = "";
 
-  const externalTailCodes = ["10050001", "14480005", "13350004", "12230003", "18600010", "20010001", "00040004", "00010004"];
-  const normalTailCodes = ["0053", "0041", "0026", "0061", "0003", "0004", "0005", "0010", "0030", "0011", "0020", "0022", "0033", "0065", "0071", "0088"];
+  const externalTailCodes = [
+    "10050001", "14480005", "13350004", "12230003",
+    "18600010", "20010001", "00040004", "00010004"
+  ];
+
+  const normalTailCodes = [
+    "0053", "0041", "0026", "0061", "0003", "0004", "0005",
+    "0010", "0030", "0011", "0020", "0022", "0033", "0065", "0071", "0088"
+  ];
 
   function selectBtn(button, type) {
     const group = type === 'meal' ? document.getElementById('mealType') : document.getElementById('orderType');
@@ -151,7 +158,7 @@
       mealValue = button.dataset.value;
       const orderButtons = document.getElementById('orderType').querySelectorAll('button');
       if (mealValue === "delivery") {
-        orderValue = "4"; // 網訂
+        orderValue = "4";
         orderButtons.forEach(btn => {
           btn.classList.remove('active');
           btn.classList.add('disabled');
@@ -175,7 +182,7 @@
   function generate() {
     let store = document.getElementById("store").value.trim();
     if (store.length === 2) store = "0" + store;
-    if (!store || store.length !== 3 || isNaN(store)) {
+    if (store.length !== 3 || isNaN(store)) {
       alert("請輸入有效的3碼門市代碼");
       return;
     }
@@ -191,26 +198,19 @@
     const d = date.toISOString().slice(0, 10).replace(/-/g, "");
     const s = String(Math.floor(Math.random() * (22 - 10 + 1)) + 10).padStart(2, '0');
     const t = `${s}${String(Math.floor(Math.random() * 60)).padStart(2, '0')}${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`;
-    
-    let m, k, tail, u;
 
+    let m, k, tail, u;
     if (mealValue === "delivery") {
       m = "1";
       k = "2";
-      const useSafe = Math.random() < 0.8;
-      tail = useSafe
-        ? externalTailCodes[Math.floor(Math.random() * externalTailCodes.length)]
-        : String(Math.floor(10000000 + Math.random() * 89999999));
-      u = `${prefix}${store}${d}${tail}`;
+      tail = externalTailCodes[Math.floor(Math.random() * externalTailCodes.length)];
     } else {
       m = mealValue;
       k = "2";
-      const useSafe = Math.random() < 0.6;
-      tail = useSafe
-        ? normalTailCodes[Math.floor(Math.random() * normalTailCodes.length)]
-        : String(Math.floor(10000000 + Math.random() * 89999999));
-      u = `${prefix}${store}${d}${tail}`;
+      tail = normalTailCodes[Math.floor(Math.random() * normalTailCodes.length)];
     }
+
+    u = `${prefix}${store}${d}${tail}`;
 
     const obj = {
       S: `886K${prefix}${store}`,
@@ -227,7 +227,7 @@
     const link = `https://customer.kfc-listens.com/jfe/form/SV_1R1VSPEYVPlV1JA?Q_EED=${base64}`;
 
     navigator.clipboard.writeText(link).then(() => {
-      alert("✅已複製成功");
+      alert("✅ 已複製成功");
     });
   }
 </script>
