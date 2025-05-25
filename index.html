@@ -8,19 +8,26 @@
     html, body {
       height: 100vh;
       margin: 0;
-      background-color: #fdf6ee;
+      background: linear-gradient(to bottom, #fdf6ee, #f7e9db);
       font-family: "Microsoft JhengHei", sans-serif;
       overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+    }
+
+    .outer-shadow {
+      margin: 0 auto;
+      max-width: 540px;
+      background-color: #fff8ef;
+      border-radius: 22px;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.1);
+      padding: 10px 0;
     }
 
     .container {
-      width: 500px;
+      width: 90%;
+      max-width: 500px;
+      margin: 0 auto;
       background-color: #fffaf4;
       border-radius: 20px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       text-align: center;
       padding: 30px 25px;
       box-sizing: border-box;
@@ -116,30 +123,32 @@
   </style>
 </head>
 <body>
-<div class="container">
-  <div class="title-box">
-    <h2>小工具🛠️</h2>
+  <div class="outer-shadow">
+    <div class="container">
+      <div class="title-box">
+        <h2>小工具🛠️</h2>
+      </div>
+
+      <label>門市代碼</label>
+      <input type="text" id="store" maxlength="3" placeholder="請輸入3碼" />
+
+      <label>用餐方式</label>
+      <div class="btn-group" id="mealType">
+        <button onclick="selectBtn(this, 'meal')" data-value="2">內用</button>
+        <button onclick="selectBtn(this, 'meal')" data-value="4">外帶</button>
+        <button onclick="selectBtn(this, 'meal')" data-value="delivery">外送</button>
+      </div>
+
+      <label>點餐方式</label>
+      <div class="btn-group" id="orderType">
+        <button onclick="selectBtn(this, 'order')" data-value="3">點餐機</button>
+        <button onclick="selectBtn(this, 'order')" data-value="2">櫃檯</button>
+        <button onclick="selectBtn(this, 'order')" data-value="4">網訂</button>
+      </div>
+
+      <button id="generate" onclick="generate()">🚀 一鍵產生問卷連結</button>
+    </div>
   </div>
-
-  <label>門市代碼</label>
-  <input type="text" id="store" maxlength="3" placeholder="請輸入3碼" />
-
-  <label>用餐方式</label>
-  <div class="btn-group" id="mealType">
-    <button onclick="selectBtn(this, 'meal')" data-value="2">內用</button>
-    <button onclick="selectBtn(this, 'meal')" data-value="4">外帶</button>
-    <button onclick="selectBtn(this, 'meal')" data-value="delivery">外送</button>
-  </div>
-
-  <label>點餐方式</label>
-  <div class="btn-group" id="orderType">
-    <button onclick="selectBtn(this, 'order')" data-value="3">點餐機</button>
-    <button onclick="selectBtn(this, 'order')" data-value="2">櫃檯</button>
-    <button onclick="selectBtn(this, 'order')" data-value="4">網訂</button>
-  </div>
-
-  <button id="generate" onclick="generate()">🚀 一鍵產生問卷連結</button>
-</div>
 
 <script>
   let mealValue = "";
