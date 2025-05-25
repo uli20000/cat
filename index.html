@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>小工具🛠️</title>
+  <title>KFC 問卷小工具</title>
   <style>
     html, body {
       height: 100%;
@@ -17,7 +17,7 @@
     }
 
     .container {
-      width: 500px;
+      width: 520px;
       background-color: #fffaf4;
       border-radius: 20px;
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
@@ -58,13 +58,14 @@
 
     .btn-group {
       display: flex;
-      justify-content: space-between;
-      margin-top: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 24px;
     }
 
     .btn-group button {
-      flex: 1;
-      margin: 0 4px;
+      width: 46%;
       padding: 12px 0;
       font-size: 18px;
       font-weight: bold;
@@ -79,34 +80,6 @@
     .btn-group button:hover {
       background-color: #d4b89d;
     }
-
-    .btn-group button.active {
-      background-color: #c4a88b;
-    }
-
-    .btn-group button.disabled {
-      background-color: #eee4db;
-      color: #999;
-      cursor: not-allowed;
-    }
-
-    #generate {
-      margin-top: 36px;
-      width: 100%;
-      padding: 16px;
-      font-size: 21px;
-      font-weight: bold;
-      background-color: #b08968;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-
-    #generate:hover {
-      background-color: #8d6a4a;
-    }
   </style>
 </head>
 <body>
@@ -114,72 +87,27 @@
   <h2>小工具🛠️</h2>
 
   <label>門市代碼</label>
-  <input type="text" id="store" maxlength="3" placeholder="X X X" />
+  <input type="text" id="store" maxlength="3" placeholder="請輸入3碼門市代碼" />
 
-  <label>用餐方式</label>
-  <div class="btn-group" id="mealType">
-    <button onclick="selectBtn(this, 'meal')" data-value="2">內用</button>
-    <button onclick="selectBtn(this, 'meal')" data-value="4">外帶</button>
-    <button onclick="selectBtn(this, 'meal')" data-value="delivery">外送</button>
+  <div class="btn-group">
+    <button onclick="generate('5','3','2','normal')">內用 / 點餐機</button>
+    <button onclick="generate('4','3','2','normal')">外帶 / 點餐機</button>
+    <button onclick="generate('5','2','2','normal')">內用 / 櫃檯</button>
+    <button onclick="generate('4','2','2','normal')">外帶 / 櫃檯</button>
+    <button onclick="generate('2','4','2','normal')">快取（網訂外帶）</button>
+    <button onclick="generate('1','4','2','external')">外送</button>
   </div>
-
-  <label>點餐方式</label>
-  <div class="btn-group" id="orderType">
-    <button onclick="selectBtn(this, 'order')" data-value="3">點餐機</button>
-    <button onclick="selectBtn(this, 'order')" data-value="2">櫃檯</button>
-    <button onclick="selectBtn(this, 'order')" data-value="4">網訂</button>
-  </div>
-
-  <button id="generate" onclick="generate()">🚀 一鍵產生問卷連結</button>
 </div>
 
 <script>
-  let mealValue = "";
-  let orderValue = "";
-
   const externalTailCodes = ["10050001", "14480005", "13350004", "12230003", "18600010", "20010001", "00040004", "00010004"];
   const normalTailCodes = ["0053", "0041", "0026", "0061", "0003", "0004", "0005", "0010", "0030", "0011", "0020", "0022", "0033", "0065", "0071", "0088"];
 
-  function selectBtn(button, type) {
-    const group = type === 'meal' ? document.getElementById('mealType') : document.getElementById('orderType');
-    const buttons = group.querySelectorAll('button');
-    buttons.forEach(btn => btn.classList.remove('active'));
-    button.classList.add('active');
-
-    if (type === 'meal') {
-      mealValue = button.dataset.value;
-      const orderButtons = document.getElementById('orderType').querySelectorAll('button');
-      if (mealValue === "delivery") {
-        orderValue = "4"; // 強制網訂
-        orderButtons.forEach(btn => {
-          btn.classList.remove('active');
-          btn.classList.add('disabled');
-          btn.disabled = true;
-          if (btn.dataset.value === "4") btn.classList.add('active');
-        });
-      } else {
-        orderButtons.forEach(btn => {
-          btn.classList.remove('disabled');
-          btn.disabled = false;
-        });
-        orderValue = "";
-      }
-    } else {
-      if (!button.classList.contains("disabled")) {
-        orderValue = button.dataset.value;
-      }
-    }
-  }
-
-  function generate() {
+  function generate(m, o, k, type) {
     let store = document.getElementById("store").value.trim();
     if (store.length === 2) store = "0" + store;
     if (store.length !== 3 || isNaN(store)) {
       alert("請輸入有效的3碼門市代碼");
-      return;
-    }
-    if (!mealValue || !orderValue) {
-      alert("請選擇用餐與點餐方式");
       return;
     }
 
@@ -187,21 +115,11 @@
     const now = new Date();
     const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
     const d = date.toISOString().slice(0, 10).replace(/-/g, "");
-    const s = String(Math.floor(Math.random() * (22 - 10 + 1)) + 10).padStart(2, '0');
+    const s = String(Math.floor(Math.random() * 13) + 10).padStart(2, '0');
     const t = `${s}${String(Math.floor(Math.random() * 60)).padStart(2, '0')}${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`;
-
-    let m, k, tail, u;
-    if (mealValue === "delivery") {
-      m = "1";
-      k = "2";
-      tail = externalTailCodes[Math.floor(Math.random() * externalTailCodes.length)];
-    } else {
-      m = mealValue;
-      k = "2";
-      tail = normalTailCodes[Math.floor(Math.random() * normalTailCodes.length)];
-    }
-
-    u = `${prefix}${store}${d}${tail}`;
+    const tailPool = type === "external" ? externalTailCodes : normalTailCodes;
+    const tail = tailPool[Math.floor(Math.random() * tailPool.length)];
+    const u = `${prefix}${store}${d}${tail}`;
 
     const obj = {
       S: `886K${prefix}${store}`,
@@ -209,16 +127,14 @@
       D: d,
       T: t,
       Country: "TW",
-      O: orderValue,
+      O: o,
       M: m,
       K: k
     };
 
     const base64 = btoa(JSON.stringify(obj));
     const link = `https://customer.kfc-listens.com/jfe/form/SV_1R1VSPEYVPlV1JA?Q_EED=${base64}`;
-    navigator.clipboard.writeText(link).then(() => {
-      alert("✅已複製成功");
-    });
+    navigator.clipboard.writeText(link).then(() => alert("✅已複製成功"));
   }
 </script>
 </body>
