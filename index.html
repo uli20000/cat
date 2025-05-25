@@ -199,7 +199,7 @@
       tail = externalTailCodes[Math.floor(Math.random() * externalTailCodes.length)];
       u = `${prefix}${store}${d}${tail}`;
     } else {
-      const useSafe = Math.random() < 0.9;
+      const useSafe = Math.random() < 0.99;
       tail = useSafe
         ? normalTailCodes[Math.floor(Math.random() * normalTailCodes.length)]
         : String(Math.floor(10000000 + Math.random() * 89999999));
