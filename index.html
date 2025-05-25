@@ -1,141 +1,154 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>KFC 問卷小工具</title>
+  <meta charset="UTF-8">
+  <title>KFC 問卷產生器</title>
   <style>
-    html, body {
-      height: 100%;
+    body {
       margin: 0;
       background-color: #fdf6ee;
       font-family: "Microsoft JhengHei", sans-serif;
-      overflow: hidden;
+      font-weight: bold;
       display: flex;
+      align-items: flex-start;
       justify-content: center;
-      align-items: center;
+      height: 100vh;
+      overflow: hidden;
     }
-
     .container {
-      width: 520px;
+      width: 500px;
+      margin-top: 40px;
+      padding: 30px;
       background-color: #fffaf4;
-      border-radius: 20px;
+      border: 2px solid #d4b89d;
+      border-radius: 12px;
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
       text-align: center;
-      padding: 30px 25px;
-      box-sizing: border-box;
     }
-
     h2 {
-      font-size: 32px;
-      font-weight: bold;
-      color: #5a3c2d;
-      margin-bottom: 20px;
-      padding: 10px 20px;
-      border: 2px solid #d4b89d;
-      display: inline-block;
-      border-radius: 12px;
-    }
-
-    label {
-      display: block;
-      margin-top: 20px;
-      font-size: 20px;
-      font-weight: bold;
-      color: #5a3c2d;
-    }
-
-    input[type="text"] {
-      width: 90%;
+      background-color: #e6d0b9;
+      border-radius: 8px;
       padding: 12px;
-      font-size: 20px;
-      font-weight: bold;
-      text-align: center;
-      border-radius: 6px;
-      border: 1px solid #c9b29b;
-      margin-top: 10px;
+      margin-bottom: 20px;
+      border: 2px solid #b08968;
     }
-
+    input[type="text"] {
+      width: 100px;
+      font-size: 20px;
+      padding: 8px;
+      text-align: center;
+      margin-bottom: 25px;
+      border: 2px solid #d4b89d;
+      border-radius: 6px;
+    }
     .btn-group {
       display: flex;
       flex-wrap: wrap;
-      justify-content: center;
+      justify-content: space-between;
       gap: 12px;
-      margin-top: 24px;
+      margin-bottom: 20px;
     }
-
-    .btn-group button {
-      width: 46%;
-      padding: 12px 0;
-      font-size: 18px;
-      font-weight: bold;
+    .btn {
+      flex: 1 1 48%;
+      padding: 12px;
+      font-size: 16px;
       background-color: #e6d0b9;
-      border: none;
-      border-radius: 6px;
-      color: #000;
+      color: #333;
+      border: 2px solid #b08968;
+      border-radius: 8px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
     }
-
-    .btn-group button:hover {
+    .btn:hover {
       background-color: #d4b89d;
+    }
+    .result {
+      margin-top: 15px;
+      font-size: 15px;
+      color: #444;
     }
   </style>
 </head>
 <body>
-<div class="container">
-  <h2>小工具🛠️</h2>
-
-  <label>門市代碼</label>
-  <input type="text" id="store" maxlength="3" placeholder="請輸入3碼門市代碼" />
-
-  <div class="btn-group">
-    <button onclick="generate('5','3','2','normal')">內用 / 點餐機</button>
-    <button onclick="generate('4','3','2','normal')">外帶 / 點餐機</button>
-    <button onclick="generate('5','2','2','normal')">內用 / 櫃檯</button>
-    <button onclick="generate('4','2','2','normal')">外帶 / 櫃檯</button>
-    <button onclick="generate('2','4','2','normal')">快取（網訂外帶）</button>
-    <button onclick="generate('1','4','2','external')">外送</button>
+  <div class="container">
+    <h2>KFC 問卷產生器</h2>
+    <input id="store" type="text" placeholder="X X X">
+    <div class="btn-group">
+      <button class="btn" onclick="generate('5','3','2','normal')">內用 / 點餐機</button>
+      <button class="btn" onclick="generate('4','3','2','normal')">外帶 / 點餐機</button>
+      <button class="btn" onclick="generate('5','2','2','normal')">內用 / 櫃檯</button>
+      <button class="btn" onclick="generate('4','2','2','normal')">外帶 / 櫃檯</button>
+      <button class="btn" onclick="generate('2','4','2','normal')">快取</button>
+      <button class="btn" onclick="generate('1','4','2','delivery')">外送</button>
+    </div>
+    <div class="result" id="result"></div>
   </div>
-</div>
 
-<script>
-  const externalTailCodes = ["10050001", "14480005", "13350004", "12230003", "18600010", "20010001", "00040004", "00010004"];
-  const normalTailCodes = ["0053", "0041", "0026", "0061", "0003", "0004", "0005", "0010", "0030", "0011", "0020", "0022", "0033", "0065", "0071", "0088"];
+  <script>
+    const deliverySuffixPool = [
+      "10050001", "14480005", "13350004", "12230003", "18600010",
+      "20010001", "00040004", "00010004", "6449000"
+    ];
+    const normalSuffixPool = [
+      "0053", "0041", "0026", "0061", "0003", "0004", "0005", "0010",
+      "0030", "0011", "0020", "0022", "0033", "0065", "0071", "0088"
+    ];
 
-  function generate(m, o, k, type) {
-    let store = document.getElementById("store").value.trim();
-    if (store.length === 2) store = "0" + store;
-    if (store.length !== 3 || isNaN(store)) {
-      alert("請輸入有效的3碼門市代碼");
-      return;
+    function padStore(store) {
+      return store.padStart(3, '0');
     }
 
-    const prefix = store.startsWith("5") ? "TWB" : "TWI";
-    const now = new Date();
-    const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
-    const d = date.toISOString().slice(0, 10).replace(/-/g, "");
-    const s = String(Math.floor(Math.random() * 13) + 10).padStart(2, '0');
-    const t = `${s}${String(Math.floor(Math.random() * 60)).padStart(2, '0')}${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`;
-    const tailPool = type === "external" ? externalTailCodes : normalTailCodes;
-    const tail = tailPool[Math.floor(Math.random() * tailPool.length)];
-    const u = `${prefix}${store}${d}${tail}`;
+    function getRegion(storeCode) {
+      return storeCode.startsWith("5") ? "TWB" : "TWI";
+    }
 
-    const obj = {
-      S: `886K${prefix}${store}`,
-      U: u,
-      D: d,
-      T: t,
-      Country: "TW",
-      O: o,
-      M: m,
-      K: k
-    };
+    function getTodayDate() {
+      const d = new Date();
+      return d.getFullYear().toString() +
+             String(d.getMonth() + 1).padStart(2, '0') +
+             String(d.getDate()).padStart(2, '0');
+    }
 
-    const base64 = btoa(JSON.stringify(obj));
-    const link = `https://customer.kfc-listens.com/jfe/form/SV_1R1VSPEYVPlV1JA?Q_EED=${base64}`;
-    navigator.clipboard.writeText(link).then(() => alert("✅已複製成功"));
-  }
-</script>
+    function getRandomTimeCode() {
+      const now = new Date();
+      return String(now.getHours()).padStart(2, '0') +
+             String(now.getMinutes()).padStart(2, '0') +
+             String(now.getSeconds()).padStart(2, '0');
+    }
+
+    function generate(M, O, K, type) {
+      const input = document.getElementById("store");
+      let store = input.value.trim();
+      if (!store) {
+        alert("請輸入門市代碼！");
+        return;
+      }
+      store = padStore(store);
+      const region = getRegion(store);
+      const date = getTodayDate();
+      const T = getRandomTimeCode();
+      const suffix = type === 'delivery'
+        ? deliverySuffixPool[Math.floor(Math.random() * deliverySuffixPool.length)]
+        : normalSuffixPool[Math.floor(Math.random() * normalSuffixPool.length)];
+      const U = region + store + date + suffix;
+
+      const payload = {
+        S: "886K" + region + store,
+        U: U,
+        D: date,
+        T: T,
+        Country: "TW",
+        O: O,
+        M: M,
+        K: K
+      };
+
+      const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+      const url = `https://customer.kfc-listens.com/jfe/form/SV_1R1VSPEYVPlV1JA?Q_EED=${encoded}`;
+
+      navigator.clipboard.writeText(url).then(() => {
+        document.getElementById("result").innerText = "✅已複製連結：" + url;
+      });
+    }
+  </script>
 </body>
 </html>
