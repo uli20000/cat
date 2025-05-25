@@ -1,70 +1,79 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <title>KFC 問卷產生器</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KFC 問卷小工具</title>
   <style>
-    body {
+    html, body {
       margin: 0;
+      padding: 0;
       background-color: #fdf6ee;
       font-family: "Microsoft JhengHei", sans-serif;
       font-weight: bold;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      height: 100vh;
       overflow: hidden;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
     }
+
     .container {
-      width: 500px;
+      width: 520px;
       margin-top: 40px;
-      padding: 30px;
       background-color: #fffaf4;
-      border: 2px solid #d4b89d;
-      border-radius: 12px;
+      border-radius: 20px;
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
       text-align: center;
+      padding: 30px 25px;
+      box-sizing: border-box;
     }
+
     h2 {
-      background-color: #e6d0b9;
-      border-radius: 8px;
-      padding: 12px;
+      font-size: 32px;
+      font-weight: bold;
+      color: #5a3c2d;
       margin-bottom: 20px;
-      border: 2px solid #b08968;
-    }
-    input[type="text"] {
-      width: 100px;
-      font-size: 20px;
-      padding: 8px;
-      text-align: center;
-      margin-bottom: 25px;
+      padding: 10px 20px;
       border: 2px solid #d4b89d;
-      border-radius: 6px;
+      display: inline-block;
+      border-radius: 12px;
     }
+
+    input[type="text"] {
+      width: 90%;
+      padding: 12px;
+      font-size: 20px;
+      font-weight: bold;
+      text-align: center;
+      border-radius: 6px;
+      border: 1px solid #c9b29b;
+      margin-top: 10px;
+    }
+
     .btn-group {
       display: flex;
       flex-wrap: wrap;
-      justify-content: space-between;
+      justify-content: center;
       gap: 12px;
-      margin-bottom: 20px;
+      margin-top: 24px;
     }
-    .btn {
-      flex: 1 1 48%;
-      padding: 12px;
-      font-size: 16px;
+
+    .btn-group button {
+      width: 46%;
+      padding: 12px 0;
+      font-size: 18px;
+      font-weight: bold;
       background-color: #e6d0b9;
-      color: #333;
-      border: 2px solid #b08968;
-      border-radius: 8px;
+      border: none;
+      border-radius: 6px;
+      color: #000;
       cursor: pointer;
+      transition: background-color 0.3s ease;
     }
-    .btn:hover {
+
+    .btn-group button:hover {
       background-color: #d4b89d;
-    }
-    .result {
-      margin-top: 15px;
-      font-size: 15px;
-      color: #444;
     }
   </style>
 </head>
@@ -73,14 +82,13 @@
     <h2>KFC 問卷產生器</h2>
     <input id="store" type="text" placeholder="X X X">
     <div class="btn-group">
-      <button class="btn" onclick="generate('5','3','2','normal')">內用 / 點餐機</button>
-      <button class="btn" onclick="generate('4','3','2','normal')">外帶 / 點餐機</button>
-      <button class="btn" onclick="generate('5','2','2','normal')">內用 / 櫃檯</button>
-      <button class="btn" onclick="generate('4','2','2','normal')">外帶 / 櫃檯</button>
-      <button class="btn" onclick="generate('2','4','2','normal')">快取</button>
-      <button class="btn" onclick="generate('1','4','2','delivery')">外送</button>
+      <button onclick="generate('5','3','2','normal')">內用 / 點餐機</button>
+      <button onclick="generate('4','3','2','normal')">外帶 / 點餐機</button>
+      <button onclick="generate('5','2','2','normal')">內用 / 櫃檯</button>
+      <button onclick="generate('4','2','2','normal')">外帶 / 櫃檯</button>
+      <button onclick="generate('2','4','2','normal')">快取</button>
+      <button onclick="generate('1','4','2','delivery')">外送</button>
     </div>
-    <div class="result" id="result"></div>
   </div>
 
   <script>
@@ -146,7 +154,7 @@
       const url = `https://customer.kfc-listens.com/jfe/form/SV_1R1VSPEYVPlV1JA?Q_EED=${encoded}`;
 
       navigator.clipboard.writeText(url).then(() => {
-        document.getElementById("result").innerText = "✅已複製連結：" + url;
+        alert("已複製完成✅");
       });
     }
   </script>
