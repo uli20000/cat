@@ -30,7 +30,6 @@
 
     h2 {
       font-size: 30px;
-      font-weight: bold;
       color: #4a3c2b;
       margin-bottom: 24px;
       padding: 12px 24px;
@@ -44,7 +43,6 @@
       width: 90%;
       padding: 14px;
       font-size: 20px;
-      font-weight: bold;
       text-align: center;
       border-radius: 6px;
       border: 2px solid #bda993;
@@ -64,7 +62,6 @@
       width: 48%;
       padding: 16px 0;
       font-size: 20px;
-      font-weight: bold;
       background: linear-gradient(to bottom, #e8ddcf, #ddd2c5);
       border: 2px solid #b9a48d;
       border-radius: 8px;
@@ -81,11 +78,13 @@
 <body>
   <div class="container">
     <h2>小工具🛠️</h2>
-    <input id="store" type="text" value="226">
+
+    <input id="store" type="text" maxlength="3" placeholder="請輸入3碼門市代碼" />
+
     <div class="btn-group">
-      <button onclick="generate('1','3','2','normal')">內用 / 點餐機</button>
+      <button onclick="generate('2','3','2','normal')">內用 / 點餐機</button>
       <button onclick="generate('4','3','2','normal')">外帶 / 點餐機</button>
-      <button onclick="generate('1','2','2','normal')">內用 / 櫃檯</button>
+      <button onclick="generate('2','2','2','normal')">內用 / 櫃檯</button>
       <button onclick="generate('4','2','2','normal')">外帶 / 櫃檯</button>
       <button onclick="generate('2','4','2','normal')">快取</button>
       <button onclick="generate('1','4','2','delivery')">外送</button>
@@ -93,58 +92,51 @@
   </div>
 
   <script>
-    const deliverySuffixPool = [
+    const deliveryTailCodes = [
       "10050001", "14480005", "13350004", "12230003", "18600010",
       "20010001", "00040004", "00010004", "6449000"
     ];
-    const normalSuffixPool = [
+    const normalTailCodes = [
       "0053", "0041", "0026", "0061", "0003", "0004", "0005", "0010",
       "0030", "0011", "0020", "0022", "0033", "0065", "0071", "0088"
     ];
 
-    function padStore(store) {
-      return store.padStart(3, '0');
-    }
-
-    function getRegion(storeCode) {
-      return storeCode.startsWith("5") ? "TWB" : "TWI";
-    }
-
-    function getTodayDate() {
+    function getYesterdayDateStr() {
       const d = new Date();
+      d.setDate(d.getDate() - 1);
       return d.getFullYear().toString() +
              String(d.getMonth() + 1).padStart(2, '0') +
              String(d.getDate()).padStart(2, '0');
     }
 
     function getRandomTimeCode() {
-      const now = new Date();
-      return String(now.getHours()).padStart(2, '0') +
-             String(now.getMinutes()).padStart(2, '0') +
-             String(now.getSeconds()).padStart(2, '0');
+      const h = String(Math.floor(Math.random() * 13) + 10).padStart(2, '0');
+      const m = String(Math.floor(Math.random() * 60)).padStart(2, '0');
+      const s = String(Math.floor(Math.random() * 60)).padStart(2, '0');
+      return h + m + s;
     }
 
     function generate(M, O, K, type) {
-      const input = document.getElementById("store");
-      let store = input.value.trim();
-      if (!store) {
-        alert("請輸入門市代碼！");
+      let store = document.getElementById("store").value.trim();
+      if (store.length === 2) store = "0" + store;
+      if (store.length !== 3 || isNaN(store)) {
+        alert("請輸入有效的3碼門市代碼");
         return;
       }
-      store = padStore(store);
-      const region = getRegion(store);
-      const date = getTodayDate();
-      const T = getRandomTimeCode();
-      const suffix = type === 'delivery'
-        ? deliverySuffixPool[Math.floor(Math.random() * deliverySuffixPool.length)]
-        : normalSuffixPool[Math.floor(Math.random() * normalSuffixPool.length)];
-      const U = region + store + date + suffix;
+
+      const prefix = store.startsWith("5") ? "TWB" : "TWI";
+      const date = getYesterdayDateStr();
+      const timeCode = getRandomTimeCode();
+      const tail = type === 'delivery'
+        ? deliveryTailCodes[Math.floor(Math.random() * deliveryTailCodes.length)]
+        : normalTailCodes[Math.floor(Math.random() * normalTailCodes.length)];
+      const u = prefix + store + date + tail;
 
       const payload = {
-        S: "886K" + region + store,
-        U: U,
+        S: "886K" + prefix + store,
+        U: u,
         D: date,
-        T: T,
+        T: timeCode,
         Country: "TW",
         O: O,
         M: M,
@@ -155,7 +147,7 @@
       const url = `https://customer.kfc-listens.com/jfe/form/SV_1R1VSPEYVPlV1JA?Q_EED=${encoded}`;
 
       navigator.clipboard.writeText(url).then(() => {
-        alert("已複製完成✅");
+        alert("✅已複製成功");
       });
     }
   </script>
