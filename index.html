@@ -6,53 +6,41 @@
   <title>小工具🛠️</title>
   <style>
     html, body {
-      height: 100vh;
+      height: 100%;
       margin: 0;
-      background: linear-gradient(to bottom, #fdf6ee, #f7e9db);
+      background-color: #fdf6ee;
       font-family: "Microsoft JhengHei", sans-serif;
       overflow: hidden;
-    }
-
-    .outer-shadow {
-      margin: 0 auto;
-      max-width: 540px;
-      background-color: #fff8ef;
-      border-radius: 22px;
-      box-shadow: 0 0 25px rgba(0, 0, 0, 0.1);
-      padding: 10px 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
     }
 
     .container {
-      width: 90%;
-      max-width: 500px;
-      margin: 0 auto;
+      width: 500px;
       background-color: #fffaf4;
       border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
       text-align: center;
       padding: 30px 25px;
       box-sizing: border-box;
+      margin-top: 20px;
     }
 
-    .title-box {
-      display: inline-block;
-      padding: 8px 20px;
-      border: 2px solid #b08968;
-      border-radius: 12px;
-      background-color: #fff5e6;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-      margin-bottom: 25px;
-    }
-
-    .title-box h2 {
+    h2 {
       font-size: 30px;
       font-weight: bold;
       color: #5a3c2d;
-      margin: 0;
+      margin-bottom: 30px;
+      border: 2px solid #c4a88b;
+      padding: 10px;
+      border-radius: 10px;
+      background-color: #fdf0df;
     }
 
     label {
       display: block;
-      margin-top: 18px;
+      margin-top: 20px;
       font-size: 20px;
       font-weight: bold;
       color: #5a3c2d;
@@ -106,7 +94,7 @@
     #generate {
       margin-top: 40px;
       width: 100%;
-      padding: 16px;
+      padding: 18px;
       font-size: 22px;
       font-weight: bold;
       background-color: #b08968;
@@ -123,32 +111,28 @@
   </style>
 </head>
 <body>
-  <div class="outer-shadow">
-    <div class="container">
-      <div class="title-box">
-        <h2>小工具🛠️</h2>
-      </div>
+<div class="container">
+  <h2>小工具🛠️</h2>
 
-      <label>門市代碼</label>
-      <input type="text" id="store" maxlength="3" placeholder="請輸入3碼" />
+  <label>門市代碼</label>
+  <input type="text" id="store" maxlength="3" placeholder="請輸入3碼門市代碼" />
 
-      <label>用餐方式</label>
-      <div class="btn-group" id="mealType">
-        <button onclick="selectBtn(this, 'meal')" data-value="2">內用</button>
-        <button onclick="selectBtn(this, 'meal')" data-value="4">外帶</button>
-        <button onclick="selectBtn(this, 'meal')" data-value="delivery">外送</button>
-      </div>
-
-      <label>點餐方式</label>
-      <div class="btn-group" id="orderType">
-        <button onclick="selectBtn(this, 'order')" data-value="3">點餐機</button>
-        <button onclick="selectBtn(this, 'order')" data-value="2">櫃檯</button>
-        <button onclick="selectBtn(this, 'order')" data-value="4">網訂</button>
-      </div>
-
-      <button id="generate" onclick="generate()">🚀 一鍵產生問卷連結</button>
-    </div>
+  <label>用餐方式</label>
+  <div class="btn-group" id="mealType">
+    <button onclick="selectBtn(this, 'meal')" data-value="1">內用</button>
+    <button onclick="selectBtn(this, 'meal')" data-value="2">外帶</button>
+    <button onclick="selectBtn(this, 'meal')" data-value="delivery">外送</button>
   </div>
+
+  <label>點餐方式</label>
+  <div class="btn-group" id="orderType">
+    <button onclick="selectBtn(this, 'order')" data-value="3">點餐機</button>
+    <button onclick="selectBtn(this, 'order')" data-value="2">櫃檯</button>
+    <button onclick="selectBtn(this, 'order')" data-value="4">網訂</button>
+  </div>
+
+  <button id="generate" onclick="generate()">🚀 一鍵產生問卷連結</button>
+</div>
 
 <script>
   let mealValue = "";
@@ -167,7 +151,7 @@
       mealValue = button.dataset.value;
       const orderButtons = document.getElementById('orderType').querySelectorAll('button');
       if (mealValue === "delivery") {
-        orderValue = "4";
+        orderValue = "4"; // 網訂
         orderButtons.forEach(btn => {
           btn.classList.remove('active');
           btn.classList.add('disabled');
@@ -191,10 +175,11 @@
   function generate() {
     let store = document.getElementById("store").value.trim();
     if (store.length === 2) store = "0" + store;
-    if (store.length !== 3 || isNaN(store)) {
+    if (!store || store.length !== 3 || isNaN(store)) {
       alert("請輸入有效的3碼門市代碼");
       return;
     }
+
     if (!mealValue || !orderValue) {
       alert("請選擇用餐與點餐方式");
       return;
@@ -206,7 +191,7 @@
     const d = date.toISOString().slice(0, 10).replace(/-/g, "");
     const s = String(Math.floor(Math.random() * (22 - 10 + 1)) + 10).padStart(2, '0');
     const t = `${s}${String(Math.floor(Math.random() * 60)).padStart(2, '0')}${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`;
-
+    
     let m, k, tail, u;
 
     if (mealValue === "delivery") {
@@ -216,6 +201,7 @@
       tail = useSafe
         ? externalTailCodes[Math.floor(Math.random() * externalTailCodes.length)]
         : String(Math.floor(10000000 + Math.random() * 89999999));
+      u = `${prefix}${store}${d}${tail}`;
     } else {
       m = mealValue;
       k = "2";
@@ -223,9 +209,8 @@
       tail = useSafe
         ? normalTailCodes[Math.floor(Math.random() * normalTailCodes.length)]
         : String(Math.floor(10000000 + Math.random() * 89999999));
+      u = `${prefix}${store}${d}${tail}`;
     }
-
-    u = `${prefix}${store}${d}${tail}`;
 
     const obj = {
       S: `886K${prefix}${store}`,
@@ -240,6 +225,7 @@
 
     const base64 = btoa(JSON.stringify(obj));
     const link = `https://customer.kfc-listens.com/jfe/form/SV_1R1VSPEYVPlV1JA?Q_EED=${base64}`;
+
     navigator.clipboard.writeText(link).then(() => {
       alert("✅已複製成功");
     });
