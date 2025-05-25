@@ -115,13 +115,13 @@
   <h2>小工具🛠️</h2>
 
   <label>門市代碼</label>
-  <input type="text" id="store" maxlength="3" placeholder="xxx" />
+  <input type="text" id="store" maxlength="3" placeholder="請輸入3碼門市代碼" />
 
   <label>用餐方式</label>
   <div class="btn-group" id="mealType">
     <button onclick="selectBtn(this, 'meal')" data-value="2">內用</button>
     <button onclick="selectBtn(this, 'meal')" data-value="4">外帶</button>
-    <button onclick="selectBtn(this, 'meal')" data-value="delivery">外送</button>
+    <button onclick="selectBtn(this, 'meal')" data-value="外送">外送</button>
   </div>
 
   <label>點餐方式</label>
@@ -138,39 +138,31 @@
   let mealValue = "";
   let orderValue = "";
 
-  const externalTailCodes = [
-    "10050001", "14480005", "13350004", "12230003",
-    "18600010", "20010001", "00040004", "00010004"
-  ];
-
-  const normalTailCodes = [
-    "0053", "0041", "0026", "0061", "0003", "0004", "0005",
-    "0010", "0030", "0011", "0020", "0022", "0033", "0065", "0071", "0088"
-  ];
+  const externalTailCodes = ["10050001", "14480005", "13350004", "12230003", "18600010", "20010001", "00040004", "00010004"];
+  const normalTailCodes = ["0053", "0041", "0026", "0061", "0003", "0004", "0005", "0010", "0030", "0011", "0020", "0022", "0033"];
 
   function selectBtn(button, type) {
     const group = type === 'meal' ? document.getElementById('mealType') : document.getElementById('orderType');
     const buttons = group.querySelectorAll('button');
     buttons.forEach(btn => btn.classList.remove('active'));
+
     button.classList.add('active');
 
     if (type === 'meal') {
       mealValue = button.dataset.value;
       const orderButtons = document.getElementById('orderType').querySelectorAll('button');
-      if (mealValue === "delivery") {
-        orderValue = "4";
+      if (mealValue === "外送") {
+        orderValue = "4"; // 網訂
         orderButtons.forEach(btn => {
           btn.classList.remove('active');
           btn.classList.add('disabled');
-          btn.disabled = true;
           if (btn.dataset.value === "4") btn.classList.add('active');
         });
       } else {
         orderButtons.forEach(btn => {
           btn.classList.remove('disabled');
-          btn.disabled = false;
         });
-        orderValue = "";
+        orderValue = ""; // 等待點選
       }
     } else {
       if (!button.classList.contains("disabled")) {
@@ -180,13 +172,11 @@
   }
 
   function generate() {
-    let store = document.getElementById("store").value.trim();
-    if (store.length === 2) store = "0" + store;
-    if (store.length !== 3 || isNaN(store)) {
+    const store = document.getElementById("store").value.trim();
+    if (!store || store.length !== 3 || isNaN(store)) {
       alert("請輸入有效的3碼門市代碼");
       return;
     }
-
     if (!mealValue || !orderValue) {
       alert("請選擇用餐與點餐方式");
       return;
@@ -198,19 +188,23 @@
     const d = date.toISOString().slice(0, 10).replace(/-/g, "");
     const s = String(Math.floor(Math.random() * (22 - 10 + 1)) + 10).padStart(2, '0');
     const t = `${s}${String(Math.floor(Math.random() * 60)).padStart(2, '0')}${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`;
+    let k = "2";
+    let m = mealValue;
+    let tail = "";
+    let u = "";
 
-    let m, k, tail, u;
-    if (mealValue === "delivery") {
-      m = "1";
-      k = "2";
+    if (mealValue === "外送") {
+      m = "1";  // 觸發外送題組
+      k = "1";
       tail = externalTailCodes[Math.floor(Math.random() * externalTailCodes.length)];
+      u = `${prefix}${store}${d}${tail}`;
     } else {
-      m = mealValue;
-      k = "2";
-      tail = normalTailCodes[Math.floor(Math.random() * normalTailCodes.length)];
+      const useSafe = Math.random() < 0.6;
+      tail = useSafe
+        ? normalTailCodes[Math.floor(Math.random() * normalTailCodes.length)]
+        : String(Math.floor(10000000 + Math.random() * 89999999));
+      u = `${prefix}${store}${d}${tail}`;
     }
-
-    u = `${prefix}${store}${d}${tail}`;
 
     const obj = {
       S: `886K${prefix}${store}`,
@@ -227,7 +221,7 @@
     const link = `https://customer.kfc-listens.com/jfe/form/SV_1R1VSPEYVPlV1JA?Q_EED=${base64}`;
 
     navigator.clipboard.writeText(link).then(() => {
-      alert("✅ 已複製成功");
+      alert("已複製成功");
     });
   }
 </script>
