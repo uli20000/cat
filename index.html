@@ -13,29 +13,28 @@
       overflow: hidden;
       display: flex;
       justify-content: center;
-      align-items: flex-start;
+      align-items: center;
     }
 
     .container {
       width: 500px;
       background-color: #fffaf4;
       border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
       text-align: center;
       padding: 30px 25px;
       box-sizing: border-box;
-      margin-top: 20px;
     }
 
     h2 {
-      font-size: 30px;
+      font-size: 32px;
       font-weight: bold;
       color: #5a3c2d;
-      margin-bottom: 30px;
-      border: 2px solid #c4a88b;
-      padding: 10px;
-      border-radius: 10px;
-      background-color: #fdf0df;
+      margin-bottom: 20px;
+      padding: 10px 20px;
+      border: 2px solid #d4b89d;
+      display: inline-block;
+      border-radius: 12px;
     }
 
     label {
@@ -92,10 +91,10 @@
     }
 
     #generate {
-      margin-top: 40px;
+      margin-top: 36px;
       width: 100%;
-      padding: 18px;
-      font-size: 22px;
+      padding: 16px;
+      font-size: 21px;
       font-weight: bold;
       background-color: #b08968;
       color: white;
@@ -115,13 +114,13 @@
   <h2>小工具🛠️</h2>
 
   <label>門市代碼</label>
-  <input type="text" id="store" maxlength="3" value="226" />
+  <input type="text" id="store" maxlength="3" placeholder="X X X" />
 
   <label>用餐方式</label>
   <div class="btn-group" id="mealType">
     <button onclick="selectBtn(this, 'meal')" data-value="2">內用</button>
     <button onclick="selectBtn(this, 'meal')" data-value="4">外帶</button>
-    <button onclick="selectBtn(this, 'meal')" data-value="外送">外送</button>
+    <button onclick="selectBtn(this, 'meal')" data-value="delivery">外送</button>
   </div>
 
   <label>點餐方式</label>
@@ -139,30 +138,31 @@
   let orderValue = "";
 
   const externalTailCodes = ["10050001", "14480005", "13350004", "12230003", "18600010", "20010001", "00040004", "00010004"];
-  const normalTailCodes = ["0053", "0041", "0026", "0061", "0003", "0004", "0005", "0010", "0030", "0011", "0020", "0022", "0033"];
+  const normalTailCodes = ["0053", "0041", "0026", "0061", "0003", "0004", "0005", "0010", "0030", "0011", "0020", "0022", "0033", "0065", "0071", "0088"];
 
   function selectBtn(button, type) {
     const group = type === 'meal' ? document.getElementById('mealType') : document.getElementById('orderType');
     const buttons = group.querySelectorAll('button');
     buttons.forEach(btn => btn.classList.remove('active'));
-
     button.classList.add('active');
 
     if (type === 'meal') {
       mealValue = button.dataset.value;
       const orderButtons = document.getElementById('orderType').querySelectorAll('button');
-      if (mealValue === "外送") {
-        orderValue = "4"; // 網訂
+      if (mealValue === "delivery") {
+        orderValue = "4"; // 強制網訂
         orderButtons.forEach(btn => {
           btn.classList.remove('active');
           btn.classList.add('disabled');
+          btn.disabled = true;
           if (btn.dataset.value === "4") btn.classList.add('active');
         });
       } else {
         orderButtons.forEach(btn => {
           btn.classList.remove('disabled');
+          btn.disabled = false;
         });
-        orderValue = ""; // 等待點選
+        orderValue = "";
       }
     } else {
       if (!button.classList.contains("disabled")) {
@@ -172,8 +172,9 @@
   }
 
   function generate() {
-    const store = document.getElementById("store").value.trim();
-    if (!store || store.length !== 3 || isNaN(store)) {
+    let store = document.getElementById("store").value.trim();
+    if (store.length === 2) store = "0" + store;
+    if (store.length !== 3 || isNaN(store)) {
       alert("請輸入有效的3碼門市代碼");
       return;
     }
@@ -188,23 +189,19 @@
     const d = date.toISOString().slice(0, 10).replace(/-/g, "");
     const s = String(Math.floor(Math.random() * (22 - 10 + 1)) + 10).padStart(2, '0');
     const t = `${s}${String(Math.floor(Math.random() * 60)).padStart(2, '0')}${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`;
-    let k = "2";
-    let m = mealValue;
-    let tail = "";
-    let u = "";
 
-    if (mealValue === "外送") {
-      m = "1";  // 觸發外送題組
-      k = "1";
+    let m, k, tail, u;
+    if (mealValue === "delivery") {
+      m = "1";
+      k = "2";
       tail = externalTailCodes[Math.floor(Math.random() * externalTailCodes.length)];
-      u = `${prefix}${store}${d}${tail}`;
     } else {
-      const useSafe = Math.random() < 0.99;
-      tail = useSafe
-        ? normalTailCodes[Math.floor(Math.random() * normalTailCodes.length)]
-        : String(Math.floor(10000000 + Math.random() * 89999999));
-      u = `${prefix}${store}${d}${tail}`;
+      m = mealValue;
+      k = "2";
+      tail = normalTailCodes[Math.floor(Math.random() * normalTailCodes.length)];
     }
+
+    u = `${prefix}${store}${d}${tail}`;
 
     const obj = {
       S: `886K${prefix}${store}`,
@@ -219,9 +216,8 @@
 
     const base64 = btoa(JSON.stringify(obj));
     const link = `https://customer.kfc-listens.com/jfe/form/SV_1R1VSPEYVPlV1JA?Q_EED=${base64}`;
-
     navigator.clipboard.writeText(link).then(() => {
-      alert("已複製成功");
+      alert("✅已複製成功");
     });
   }
 </script>
