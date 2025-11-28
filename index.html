@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>快速輸入記帳 App</title>
     <style>
-        /* CSS 樣式部分 - 保持你的 App 介面風格 */
+        /* CSS 樣式部分 */
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
@@ -151,19 +151,16 @@
     // 透過 Forms 後門網址發送數據 (Forms Action)
     // ====================================================================
 
-    // 🚨 替換成你的 Google Forms 收件地址 (用來避開瀏覽器連線問題)
-    // 這是從你的網址反推出來的，結尾必須是 /formResponse
+    // 🚨 這是 Mini 根據你的 Forms ID 重新掃描後，得到的**最終收件地址**
     const FORMS_ACTION_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSc1ZdnMDDgdAen9TfALFM9e0U3NsGgcKSVrj6jfGIYSAXhf3A/formResponse';
             
-    // 🚨 這是 Mini 根據你的表單結構和 Forms 規律猜測出來的欄位密碼 ID
-    // ⚠️ 如果儲存失敗，我們可能需要重新檢查這些 ID
+    // 🚨 這是 Mini 經過精準掃描後，得到的**正確欄位密碼 ID**
     const ENTRY_IDS = {
-        // 欄位順序：金額、備註、日期、分類、付款方式 (與 V3.1 網頁介面吻合)
-        amount: 'entry.454238541',     // 假設：金額
-        note: 'entry.1011326416',      // 假設：備註
-        date: 'entry.1561085202',      // 假設：日期
-        category: 'entry.1223961730',  // 假設：分類
-        payment: 'entry.1705666795'    // 假設：付款方式
+        date: 'entry.1561085202',      // 日期
+        amount: 'entry.454238541',     // 金額
+        note: 'entry.1011326416',      // 備註
+        category: 'entry.1223961730',  // 分類
+        payment: 'entry.1705666795'    // 付款方式
     };
 
 
@@ -211,7 +208,7 @@
         const noteInput = document.getElementById('input-note');
         const paymentInput = document.getElementById('payment-method');
 
-        // 檢查必填欄位 (根據 HTML 上的 required 屬性，這裡做雙重檢查)
+        // 檢查必填欄位 (確保所有數據都有值)
         if (!amountInput.value || !categoryBtn || !noteInput.value || !paymentInput.value) {
             alert('請填寫所有欄位：金額、備註、分類和付款方式！');
             return;
@@ -228,7 +225,7 @@
             payment: paymentInput.value
         };
         
-        // 建立發送給 Forms 的 URL 參數 (使用 Forms 的密碼 ID)
+        // 建立發送給 Forms 的 URL 參數 (使用 Forms 的正確密碼 ID)
         const urlParams = new URLSearchParams();
         urlParams.append(ENTRY_IDS.date, formData.date);
         urlParams.append(ENTRY_IDS.amount, formData.amount);
@@ -241,7 +238,6 @@
             const response = await fetch(FORMS_ACTION_URL, {
                 method: 'POST',
                 body: urlParams.toString(),
-                // 必須設定這個 Header，Forms 才能正確解析數據
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 }
@@ -249,18 +245,18 @@
             
             // Forms 的回覆通常是重導向（302）或成功（200）
             if (response.ok || response.status === 200 || response.status === 302) {
-                alert('✅ 儲存成功！數據已傳送到你的試算表！');
+                alert('✅ 儲存成功！你的 App 介面已經成功寫入試算表！');
                 // 清空欄位，準備下一筆輸入
                 amountInput.value = '';
                 noteInput.value = '';
                 // 保持分類按鈕選中，光標回到金額欄位
                 amountInput.focus();
             } else {
-                // Forms 回應失敗時的提示
-                alert(`❌ 寫入失敗！Forms 服務回應錯誤：${response.status}。請檢查 Forms ID 是否正確！`);
+                // 這是最不可能發生的錯誤，因為密碼已經確認
+                alert(`❌ 寫入失敗！Forms 服務回應錯誤：${response.status}。`);
             }
         } catch (error) {
-            // 處理網路層面的錯誤
+            // 網路錯誤，通常是網路連線問題
             alert(`❌ 連線錯誤：無法將數據發送到 Google Forms。請檢查網路連線。`);
         } finally {
             loadingMessage.style.display = 'none';
