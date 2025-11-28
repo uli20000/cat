@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>快速輸入記帳 App</title>
+    <title>快速輸入記帳 App (最終簡化版)</title>
     <style>
         /* CSS 樣式部分 */
         body {
@@ -106,7 +106,7 @@
 <body>
 
 <div class="container">
-    <h1>快速qq輸入</h1>
+    <h1>1快速輸入</h1>
     <form id="input-form">
 
         <label for="input-date">日期</label>
@@ -120,21 +120,9 @@
 
         <label>分類 *</label>
         <div class="category-container">
-            <button type="button" class="category-btn" data-category="餐費">🍽️ 餐費</button>
-            <button type="button" class="category-btn" data-category="飲料">☕ 飲料</button>
-            <button type="button" class="category-btn" data-category="交通">🚌 交通</button>
-            <button type="button" class="category-btn" data-category="娛樂">🕹️ 娛樂</button>
+            <button type="button" class="category-btn" data-category="吃飯">🍚 吃飯</button>
             <button type="button" class="category-btn" data-category="雜費">🛍️ 雜費</button>
-            <button type="button" class="category-btn" data-category="治裝">👚 治裝</button>
-            <button type="button" class="category-btn" data-category="醫療">💊 醫療</button>
-            </div>
-
-        <label for="payment-method">付款方式 *</label>
-        <select id="payment-method" required>
-            <option value="現金">現金</option>
-            <option value="信用卡">信用卡</option>
-            <option value="電子支付">電子支付</option>
-        </select>
+        </div>
 
         <button type="submit">儲存並新增 (寫入試算表)</button>
         
@@ -148,19 +136,19 @@
 <script>
     // ====================================================================
     // Mini 為 Mifa 解決「連線錯誤」問題的 JavaScript 核心邏輯
-    // 透過 Forms 後門網址發送數據 (Forms Action)
+    // 最終簡化版：只發送 4 個欄位
     // ====================================================================
 
-    // 🚨 這是你的 Google Forms 收件地址
+    // 🚨 你的 Google Forms 收件地址
     const FORMS_ACTION_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSc1ZdnMDDgdAen9TfALFM9e0U3NsGgcKSVrj6jfGIYSAXhf3A/formResponse';
             
-    // 🚨 這是 Mini 經過精準解析後，得到的**正確欄位密碼 ID**
+    // 🚨 這是 Mini 根據你的Forms解析出的**四個**正確欄位密碼 ID
+    // 付款方式的密碼已移除
     const ENTRY_IDS = {
         date: 'entry.1746685040',      // 日期
         amount: 'entry.1118182901',     // 金額
         note: 'entry.122736162',        // 備註
-        category: 'entry.880536783',    // 分類
-        payment: 'entry.1558509355'    // 付款方式
+        category: 'entry.880536783'     // 分類
     };
 
 
@@ -206,11 +194,11 @@
         const categoryBtn = document.querySelector('.category-btn.selected');
         const loadingMessage = document.getElementById('loading-message');
         const noteInput = document.getElementById('input-note');
-        const paymentInput = document.getElementById('payment-method');
+        // 🚨 paymentInput 已移除
 
-        // 檢查必填欄位 (確保所有數據都有值)
-        if (!amountInput.value || !categoryBtn || !noteInput.value || !paymentInput.value) {
-            alert('請填寫所有欄位：金額、備註、分類和付款方式！');
+        // 檢查必填欄位
+        if (!amountInput.value || !categoryBtn || !noteInput.value) { // 檢查條件已簡化
+            alert('請填寫所有欄位：金額、備註和分類！');
             return;
         }
 
@@ -221,17 +209,16 @@
             date: document.getElementById('input-date').value,
             amount: amountInput.value,
             category: categoryBtn.dataset.category, // 從按鈕的 data-category 屬性取得
-            note: noteInput.value,
-            payment: paymentInput.value
+            note: noteInput.value
+            // 🚨 payment 數據已移除
         };
         
-        // 建立發送給 Forms 的 URL 參數 (使用 Forms 的正確密碼 ID)
+        // 建立發送給 Forms 的 URL 參數 (只包含 4 個數據)
         const urlParams = new URLSearchParams();
         urlParams.append(ENTRY_IDS.date, formData.date);
         urlParams.append(ENTRY_IDS.amount, formData.amount);
         urlParams.append(ENTRY_IDS.category, formData.category);
         urlParams.append(ENTRY_IDS.note, formData.note);
-        urlParams.append(ENTRY_IDS.payment, formData.payment);
 
         try {
             // 🚨 這裡使用 POST 請求，發送到 Forms 的收件地址，瀏覽器不會阻擋
