@@ -3,26 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mini 記帳表原型 - 給 Mifa</title>
+    <title>Mini 記帳表 - Mifa 專屬版</title>
     <style>
-        /* --- 基礎樣式與手機模擬 --- */
+        /* --- Dark Mode 基礎樣式 --- */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            background-color: #f4f7f9;
-            color: #333;
+            background-color: #121212; /* 深灰背景 */
+            color: #e0e0e0; /* 淺灰文字 */
             overflow-x: hidden;
         }
 
         .container {
             max-width: 450px; /* 模擬手機寬度 */
             margin: 0 auto;
-            background-color: #fff;
+            background-color: #1e1e1e; /* 卡片/主內容背景 */
             min-height: 100vh;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
 
-        /* --- 導航列 --- */
+        /* --- 導航列 (Dark Mode) --- */
         .tab-bar {
             display: flex;
             justify-content: space-around;
@@ -30,8 +30,8 @@
             bottom: 0;
             width: 100%;
             max-width: 450px;
-            background-color: #fff;
-            border-top: 1px solid #eee;
+            background-color: #1e1e1e;
+            border-top: 1px solid #333;
             z-index: 100;
         }
 
@@ -52,7 +52,7 @@
         }
 
         .tab-content {
-            padding: 20px 15px 70px 15px; /* 底部留給導航列空間 */
+            padding: 20px 15px 70px 15px;
             display: none;
         }
 
@@ -62,26 +62,22 @@
 
         h2 {
             color: #007bff;
-            border-bottom: 2px solid #eee;
+            border-bottom: 2px solid #333;
             padding-bottom: 10px;
             margin-top: 0;
         }
 
-        /* --- 畫面一：快速輸入 (Focus: 順手度) --- */
-        #input-form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
+        /* --- 輸入元件 (Dark Mode) --- */
         #amount-input {
             width: 100%;
             padding: 20px 10px;
             font-size: 2.5em; /* 醒目 */
             text-align: right;
-            border: 2px solid #ccc;
+            border: 2px solid #333;
             border-radius: 8px;
             box-sizing: border-box;
+            background-color: #2a2a2a; /* 輸入框背景 */
+            color: #e0e0e0;
         }
 
         .input-group label {
@@ -93,22 +89,25 @@
         .input-group input, .input-group select {
             width: 100%;
             padding: 12px;
-            border: 1px solid #ddd;
+            border: 1px solid #333;
             border-radius: 6px;
             box-sizing: border-box;
             font-size: 1em;
+            background-color: #2a2a2a;
+            color: #e0e0e0;
         }
-
+        
+        /* --- 分類按鈕 (Dark Mode) --- */
         .category-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr); /* 常用分類大按鈕 */
+            grid-template-columns: repeat(3, 1fr);
             gap: 10px;
             margin-top: 10px;
         }
 
         .category-btn {
-            background-color: #e9ecef;
-            color: #333;
+            background-color: #333;
+            color: #e0e0e0;
             border: none;
             padding: 15px 5px;
             border-radius: 8px;
@@ -133,10 +132,10 @@
             margin-top: 20px;
             cursor: pointer;
         }
-
-        /* --- 畫面二：儀表板 --- */
+        
+        /* --- 畫面二：儀表板 (Dark Mode) --- */
         .summary-box {
-            background-color: #007bff;
+            background-color: #0056b3; /* 深藍色，突出總結 */
             color: white;
             padding: 20px;
             border-radius: 10px;
@@ -144,38 +143,12 @@
             text-align: center;
         }
 
-        .summary-box h3 {
-            margin: 0 0 5px 0;
-            font-size: 1.1em;
-            opacity: 0.8;
-        }
-
-        .summary-box p {
-            font-size: 2.5em;
-            margin: 0;
-            font-weight: bold;
-        }
-
-        .progress-bar-container {
-            background-color: #ddd;
-            border-radius: 5px;
-            margin-top: 10px;
-            overflow: hidden;
-            height: 15px;
-        }
-
-        .progress-bar {
-            height: 100%;
-            width: 75%; /* 模擬進度 75% */
-            background-color: #28a745;
-        }
-        
         .daily-tip {
-            background-color: #fff3cd;
-            color: #856404;
+            background-color: #2a2a2a;
+            color: #ffc107; /* 黃色警示 */
             padding: 10px;
             border-radius: 8px;
-            border: 1px solid #ffeeba;
+            border: 1px solid #444;
             font-size: 0.9em;
             text-align: center;
             margin-bottom: 20px;
@@ -183,40 +156,36 @@
         
         .chart-placeholder {
             height: 200px;
-            background-color: #e9ecef;
+            background-color: #333;
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #6c757d;
+            color: #999;
             margin-bottom: 20px;
             font-weight: bold;
         }
         
-        /* --- 畫面三：每月設定 --- */
+        /* --- 畫面三：每月設定 (Dark Mode) --- */
         .budget-section {
-            background-color: #f8f9fa;
+            background-color: #2a2a2a;
             padding: 15px;
             border-radius: 8px;
             margin-bottom: 20px;
-            border: 1px solid #eee;
+            border: 1px solid #333;
         }
 
         .budget-item {
             display: flex;
             justify-content: space-between;
             padding: 10px 0;
-            border-bottom: 1px dashed #ddd;
+            border-bottom: 1px dashed #444;
             font-size: 1em;
-        }
-        
-        .budget-item:last-child {
-            border-bottom: none;
         }
         
         .budget-value {
             font-weight: bold;
-            color: #dc3545; /* 支出或預算用紅色系 */
+            color: #f8d7da; /* 支出或預算用淺紅警示色 */
         }
 
         .budget-summary-final {
@@ -225,7 +194,13 @@
             padding-top: 15px;
             color: #28a745; /* 結餘用綠色 */
         }
-
+        
+        /* 載入中訊息 */
+        .loading-message {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7);
+            color: white; display: none; align-items: center; justify-content: center; z-index: 9999;
+            font-size: 1.5em;
+        }
     </style>
 </head>
 <body>
@@ -250,12 +225,15 @@
                 <div class="input-group">
                     <label>選擇分類 (點擊按鈕)</label>
                     <div class="category-grid" id="category-buttons">
-                        <button type="button" class="category-btn" data-category="餐飲">🍔 餐飲</button>
-                        <button type="button" class="category-btn" data-category="交通">🚌 交通</button>
-                        <button type="button" class="category-btn" data-category="飲料">☕ 飲料</button>
-                        <button type="button" class="category-btn" data-category="娛樂">🎮 娛樂</button>
-                        <button type="button" class="category-btn" data-category="治裝">👚 治裝</button>
-                        <button type="button" class="category-btn" data-category="雜費">🛒 雜費</button>
+                        <button type="button" class="category-btn" data-category="FOOD">FOOD</button>
+                        <button type="button" class="category-btn" data-category="CLOTHS">CLOTHS</button>
+                        <button type="button" class="category-btn" data-category="HOME">HOME</button>
+                        <button type="button" class="category-btn" data-category="CAR">CAR</button>
+                        <button type="button" class="category-btn" data-category="STUDY">STUDY</button>
+                        <button type="button" class="category-btn" data-category="HAPPY">HAPPY</button>
+                        <button type="button" class="category-btn" data-category="HEALTHY">HEALTHY</button>
+                        <button type="button" class="category-btn" data-category="OTHERS">OTHERS</button>
+                        <button type="button" class="category-btn" data-category="SAVE">SAVE (預存)</button>
                     </div>
                 </div>
 
@@ -268,9 +246,11 @@
                     </select>
                 </div>
                 
-                <button type="submit" class="save-btn">✅ 儲存並新增</button>
+                <button type="submit" class="save-btn">✅ 儲存並新增 (寫入試算表)</button>
             </form>
-            <p style="text-align: center; margin-top: 15px; font-size: 0.8em; color: #999;">資料不會被儲存，僅為介面模擬。</p>
+            <p style="text-align: center; margin-top: 15px; font-size: 0.8em; color: #666;">
+                數據將透過 Google Apps Script 自動寫入你的試算表。
+            </p>
         </div>
 
         <div id="dashboard" class="tab-content">
@@ -279,9 +259,7 @@
             <div class="summary-box">
                 <h3>預計結餘 (模擬)</h3>
                 <p>$35,120</p>
-                <div class="progress-bar-container">
-                    <div class="progress-bar"></div>
-                </div>
+                <div class="progress-bar-container"><div class="progress-bar" style="width: 75%;"></div></div>
                 <small>變動支出預算已使用 75%</small>
             </div>
             
@@ -295,34 +273,16 @@
 
             <div class="budget-section">
                 <h3>分類預算與花費對比</h3>
-                <div class="budget-item">
-                    <span>🍔 餐飲預算/花費</span>
-                    <span class="budget-value">$10,000 / $8,500</span>
-                </div>
-                <div class="budget-item">
-                    <span>🚌 交通預算/花費</span>
-                    <span class="budget-value" style="color:#dc3545;">$3,000 / $3,500 (超支!)</span>
-                </div>
-                <div class="budget-item">
-                    <span>🎮 娛樂預算/花費</span>
-                    <span class="budget-value">$5,000 / $1,200</span>
-                </div>
+                <div class="budget-item"><span>FOOD 預算/花費</span><span class="budget-value">$10,000 / $8,500</span></div>
+                <div class="budget-item"><span>CAR 預算/花費</span><span class="budget-value" style="color:#dc3545;">$3,000 / $3,500 (超支!)</span></div>
+                <div class="budget-item"><span>HAPPY 預算/花費</span><span class="budget-value">$5,000 / $1,200</span></div>
             </div>
 
-            <h3>最新消費明細</h3>
+            <h3>最新消費明細 (數據來自試算表)</h3>
             <div class="budget-section">
-                <div class="budget-item">
-                    <span>11/27 - 🍔 便當</span>
-                    <span class="budget-value" style="color:#333;">$120</span>
-                </div>
-                <div class="budget-item">
-                    <span>11/26 - 🚌 油錢</span>
-                    <span class="budget-value" style="color:#333;">$800</span>
-                </div>
-                <div class="budget-item">
-                    <span>11/26 - 👚 新衣</span>
-                    <span class="budget-value" style="color:#333;">$1,999</span>
-                </div>
+                <div class="budget-item"><span>11/27 - FOOD - 便當</span><span class="budget-value" style="color:#e0e0e0;">$120</span></div>
+                <div class="budget-item"><span>11/26 - CAR - 油錢</span><span class="budget-value" style="color:#e0e0e0;">$800</span></div>
+                <div class="budget-item"><span>11/26 - CLOTHS - 新衣</span><span class="budget-value" style="color:#e0e0e0;">$1,999</span></div>
             </div>
         </div>
 
@@ -337,18 +297,18 @@
             </div>
 
             <div class="budget-section">
-                <h3>預存備用金 (總額模擬：$7,000)</h3>
+                <h3>預存備用金 (SAVE 總額模擬：$7,000)</h3>
                 <div class="budget-item"><span>緊急備用金</span><span class="budget-value">$5,000</span></div>
                 <div class="budget-item"><span>旅遊基金</span><span class="budget-value">$2,000</span></div>
             </div>
             
             <div class="budget-section">
                 <h3>變動支出預算 (總額模擬：$30,000)</h3>
-                <p style="font-size: 0.9em; color:#6c757d;">點擊金額可修改 (模擬 In-line Edit)</p>
-                <div class="budget-item"><span>🍔 餐飲</span><span class="budget-value editable" data-value="10000">$10,000</span></div>
-                <div class="budget-item"><span>🚌 交通</span><span class="budget-value editable" data-value="3000">$3,000</span></div>
-                <div class="budget-item"><span>🎮 娛樂</span><span class="budget-value editable" data-value="5000">$5,000</span></div>
-                <div class="budget-item"><span>☕ 飲料</span><span class="budget-value editable" data-value="2000">$2,000</span></div>
+                <p style="font-size: 0.9em; color:#999;">點擊金額可修改 (模擬 In-line Edit)</p>
+                <div class="budget-item"><span>FOOD</span><span class="budget-value editable" data-value="10000">$10,000</span></div>
+                <div class="budget-item"><span>CLOTHS</span><span class="budget-value editable" data-value="3000">$3,000</span></div>
+                <div class="budget-item"><span>HOME</span><span class="budget-value editable" data-value="5000">$5,000</span></div>
+                <div class="budget-item"><span>CAR</span><span class="budget-value editable" data-value="2000">$2,000</span></div>
             </div>
 
             <div class="budget-summary-final">
@@ -361,23 +321,26 @@
             <button onclick="openTab('dashboard', this)">追蹤</button>
             <button onclick="openTab('settings', this)">設定</button>
         </div>
+        
+        <div id="loading-message" class="loading-message">
+            <p>資料寫入中，請稍候...</p>
+        </div>
     </div>
 
     <script>
+        // 🚨 這是你專屬的 Apps Script URL，已經由 Mini 貼上 🚨
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxjt3oyfVbfvnEk97srbE8FOwbbs8bnYQXYGUJiwpYMTsxIu4V1sMy7hjNcZSitUaZb3Pw/exec'; 
+        
         // Tab 切換功能
         function openTab(tabId, element) {
-            // 隱藏所有內容
             var contents = document.getElementsByClassName("tab-content");
             for (var i = 0; i < contents.length; i++) {
                 contents[i].classList.remove("active");
             }
-            // 移除所有按鈕的 active 狀態
             var tabs = document.getElementsByClassName("tab-bar")[0].getElementsByTagName("button");
             for (var i = 0; i < tabs.length; i++) {
                 tabs[i].classList.remove("active");
             }
-
-            // 顯示當前內容並設定 active 狀態
             document.getElementById(tabId).classList.add("active");
             element.classList.add("active");
         }
@@ -385,44 +348,83 @@
         // 快速輸入 - 分類按鈕點擊效果
         document.getElementById('category-buttons').addEventListener('click', function(e) {
             if (e.target.classList.contains('category-btn')) {
-                // 移除其他按鈕的 selected 狀態
                 document.querySelectorAll('.category-btn').forEach(btn => {
                     btn.classList.remove('selected');
                 });
-                // 設定當前按鈕為 selected
                 e.target.classList.add('selected');
             }
         });
 
-        // 快速輸入 - 儲存按鈕模擬
-        document.getElementById('input-form').addEventListener('submit', function(e) {
+        // 🚀 數據寫入 Google Sheets 的功能 (核心)
+        document.getElementById('input-form').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const amount = document.getElementById('amount-input').value;
-            const categoryBtn = document.querySelector('.category-btn.selected');
             
-            if (amount && categoryBtn) {
-                alert(`模擬儲存成功！\n金額: ${amount}\n分類: ${categoryBtn.dataset.category}\n\n (此為前端模擬，資料不會儲存)`);
-                // 清空欄位 (模擬儲存後重置，準備下一筆輸入)
-                document.getElementById('amount-input').value = '';
-                document.getElementById('input-note').value = '';
-                categoryBtn.classList.remove('selected');
-                document.getElementById('amount-input').focus();
-            } else {
+            const amountInput = document.getElementById('amount-input');
+            const categoryBtn = document.querySelector('.category-btn.selected');
+            const loadingMessage = document.getElementById('loading-message');
+
+            if (!amountInput.value || !categoryBtn) {
                 alert('請輸入金額並選擇分類！');
+                return;
+            }
+
+            // 顯示載入中訊息
+            loadingMessage.style.display = 'flex';
+            
+            // 收集表單數據 (順序必須與 Apps Script 和試算表標題順序一樣)
+            const formData = {
+                date: document.getElementById('input-date').value,
+                amount: amountInput.value,
+                category: categoryBtn.dataset.category,
+                note: document.getElementById('input-note').value,
+                payment: document.getElementById('payment-method').value
+            };
+            
+            // 使用 URLSearchParams 將數據轉為 POST 請求需要的格式
+            const urlParams = new URLSearchParams();
+            for (const key in formData) {
+                urlParams.append(key, formData[key]);
+            }
+
+            try {
+                // 發送數據到 Google Apps Script URL
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    body: urlParams.toString(),
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                });
+                
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    alert('✅ 儲存成功！數據已寫入 Google 試算表。');
+                    // 清空欄位，準備下一筆輸入
+                    amountInput.value = '';
+                    document.getElementById('input-note').value = '';
+                    categoryBtn.classList.remove('selected');
+                    amountInput.focus();
+                } else {
+                    alert(`❌ 寫入失敗！錯誤訊息：${result.message}`);
+                }
+            } catch (error) {
+                alert(`連線錯誤：無法將數據發送到 Apps Script。請檢查網路連線。`);
+            } finally {
+                // 隱藏載入中訊息
+                loadingMessage.style.display = 'none';
             }
         });
 
         // 每月設定 - 模擬 In-line Edit
         document.querySelectorAll('.budget-value.editable').forEach(item => {
             item.addEventListener('click', function() {
-                const originalText = this.textContent;
                 const originalValue = this.dataset.value;
                 const categoryName = this.previousElementSibling.textContent;
                 
                 const newValue = prompt(`修改 ${categoryName} 的預算金額：`, originalValue);
                 
                 if (newValue !== null && !isNaN(newValue) && newValue.trim() !== "") {
-                    // 模擬更新
                     this.textContent = `$${parseInt(newValue).toLocaleString()}`;
                     this.dataset.value = parseInt(newValue);
                     alert(`預算已模擬更新為：$${parseInt(newValue).toLocaleString()}`);
@@ -432,7 +434,6 @@
 
         // 預設將日期設定為今天
         document.getElementById('input-date').valueAsDate = new Date();
-
     </script>
 </body>
 </html>
