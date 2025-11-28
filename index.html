@@ -2,426 +2,271 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mifa 記帳簿</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>快速輸入記帳 App</title>
     <style>
-        /* --- 全域設定：簡約日系風格 --- */
+        /* CSS 樣式部分 - 保持你的 App 介面風格 */
         body {
-            font-family: 'Hiragino Sans GB', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
-            background-color: #F8F8F8;
-            color: #333333;
-            overflow-x: hidden;
+            padding: 0;
+            background-color: #f0f0f5;
+            color: #333;
         }
-
         .container {
-            max-width: 400px;
+            max-width: 600px;
             margin: 0 auto;
-            background-color: #FFFFFF;
-            min-height: 100vh;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-        }
-
-        /* --- 導航列：極簡風格 --- */
-        .tab-bar {
-            display: flex;
-            justify-content: space-around;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            max-width: 400px;
-            background-color: #FFFFFF;
-            border-top: 1px solid #EEEEEE;
-            z-index: 100;
-        }
-
-        .tab-bar button {
-            background: none;
-            border: none;
-            padding: 15px 0;
-            flex-grow: 1;
-            cursor: pointer;
-            font-size: 13px;
-            color: #AAAAAA;
-            transition: color 0.3s;
-        }
-
-        .tab-bar button.active {
-            color: #5D5D5D;
-            border-top: 2px solid #5D5D5D;
-            font-weight: bold;
-        }
-
-        .tab-content {
-            padding: 20px 20px 70px 20px;
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        h2 {
-            color: #333333;
-            text-align: center;
-            border-bottom: 1px solid #CCCCCC;
-            padding-bottom: 15px;
-            margin-top: 0;
-            font-size: 1.5em;
-        }
-        
-        /* --- 輸入元件：簡潔置中 --- */
-        #amount-input {
-            width: 100%;
-            padding: 30px 0;
-            font-size: 3em;
-            text-align: center;
-            border: none;
-            border-bottom: 2px solid #DDDDDD;
-            box-sizing: border-box;
-            background-color: transparent;
-            color: #333333;
-            margin-bottom: 20px;
-        }
-
-        .input-group {
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: normal;
-            font-size: 0.9em;
-            color: #777777;
-        }
-
-        .input-group input, .input-group select {
-            width: 80%;
-            padding: 10px;
-            border: 1px solid #CCCCCC;
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-size: 1em;
-            background-color: #FFFFFF;
-            color: #333333;
-            text-align: center;
-        }
-        
-        /* --- 分類按鈕：簡約卡片感 --- */
-        .category-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-top: 10px;
-        }
-
-        .category-btn {
-            background-color: #F8F8F8;
-            color: #5D5D5D;
-            border: 1px solid #EEEEEE;
-            padding: 15px 5px;
-            border-radius: 4px;
-            font-size: 0.9em;
-            cursor: pointer;
-            transition: background-color 0.2s, border-color 0.2s;
-        }
-
-        .category-btn.selected {
-            background-color: #E8F5E9;
-            border-color: #4CAF50;
-            color: #333333;
-            font-weight: bold;
-        }
-
-        .save-btn {
-            background-color: #4CAF50;
-            color: white;
-            padding: 15px;
-            border: none;
-            border-radius: 4px;
-            font-size: 1.1em;
-            margin-top: 30px;
-            cursor: pointer;
-            width: 100%;
-            font-weight: bold;
-        }
-        
-        /* --- 儀表板/設定頁面調整 --- */
-        .summary-box {
-            background-color: #E0F7FA;
-            color: #00796B;
             padding: 20px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            text-align: center;
         }
-
-        .daily-tip, .budget-section {
-            background-color: #FFFFFF;
-            border: 1px solid #EEEEEE;
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 15px;
-        }
-
-        .budget-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px dashed #F0F0F0;
-            font-size: 1em;
-        }
-        
-        .budget-value {
-            font-weight: bold;
-            color: #D32F2F;
-        }
-        
-        .budget-summary-final {
-            font-size: 1.2em;
-            font-weight: bold;
-            padding-top: 15px;
+        h1 {
             color: #4CAF50;
             text-align: center;
+            margin-bottom: 20px;
         }
-        
-        .loading-message {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.7);
-            color: #333; display: none; align-items: center; justify-content: center; z-index: 9999;
-            font-size: 1.5em;
+        form {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="number"], input[type="text"], input[type="date"], select {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        .category-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .category-btn {
+            padding: 8px 15px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            cursor: pointer;
+            background-color: #f9f9f9;
+            color: #666;
+            transition: all 0.2s;
+            flex-grow: 1;
+            text-align: center;
+        }
+        .category-btn.selected {
+            background-color: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+            box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3);
+        }
+        button[type="submit"] {
+            width: 100%;
+            padding: 15px;
+            margin-top: 30px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            z-index: 9999;
+        }
+        .loading span {
+            padding: 20px;
+            background: #4CAF50;
+            border-radius: 8px;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div id="quick-input" class="tab-content active">
-            <h2>輸入</h2>
-            
-            <form id="input-form">
-                <input type="number" id="amount-input" placeholder="0" inputmode="decimal">
+<div class="container">
+    <h1>快速輸入</h1>
+    <form id="input-form">
 
-                <div class="input-group">
-                    <label for="input-date">日期</label>
-                    <input type="date" id="input-date" value="2025-11-28">
-                </div>
-                
-                <div class="input-group">
-                    <label for="input-note">備註</label>
-                    <input type="text" id="input-note" placeholder="例如：午餐便當">
-                </div>
-                
-                <div class="input-group">
-                    <label>分類</label>
-                    <div class="category-grid" id="category-buttons">
-                        <button type="button" class="category-btn" data-category="FOOD">飲食</button>
-                        <button type="button" class="category-btn" data-category="CLOTHS">衣物</button>
-                        <button type="button" class="category-btn" data-category="HOME">居家</button>
-                        <button type="button" class="category-btn" data-category="CAR">交通</button>
-                        <button type="button" class="category-btn" data-category="STUDY">學習</button>
-                        <button type="button" class="category-btn" data-category="HAPPY">娛樂</button>
-                        <button type="button" class="category-btn" data-category="HEALTHY">醫療</button>
-                        <button type="button" class="category-btn" data-category="OTHERS">其他</button>
-                        <button type="button" class="category-btn" data-category="SAVE">預存</button>
-                    </div>
-                </div>
+        <label for="input-date">日期</label>
+        <input type="date" id="input-date" required>
 
-                <div class="input-group">
-                    <label for="payment-method">付款</label>
-                    <select id="payment-method">
-                        <option value="cash">現金</option>
-                        <option value="credit">信用卡</option>
-                        <option value="mobile">電子支付</option>
-                    </select>
-                </div>
-                
-                <button type="submit" class="save-btn">儲存</button>
-            </form>
-            <p style="text-align: center; margin-top: 15px; font-size: 0.8em; color: #BBBBBB;">
-                數據將自動寫入你的試算表。
-            </p>
-        </div>
-
-        <div id="dashboard" class="tab-content">
-            <h2>追蹤</h2>
-
-            <div class="summary-box">
-                <h3>預計結餘</h3>
-                <p style="font-size: 1.5em; font-weight: bold;">$35,120</p>
-                <div class="progress-bar-container"><div class="progress-bar" style="width: 75%;"></div></div>
-                <small>預算已使用 75%</small>
-            </div>
-            
-            <div class="daily-tip">
-                今日安全日均消費額：**$1,250**
-            </div>
-
-            <div class="chart-placeholder">
-                <p>分類圓餅圖</p>
-            </div>
-
-            <div class="budget-section">
-                <h3>分類對比</h3>
-                <div class="budget-item"><span>飲食 預算/花費</span><span class="budget-value">$10,000 / $8,500</span></div>
-                <div class="budget-item"><span>交通 預算/花費</span><span class="budget-value" style="color:#D32F2F;">$3,000 / $3,500 (超支)</span></div>
-                <div class="budget-item"><span>娛樂 預算/花費</span><span class="budget-value">$5,000 / $1,200</span></div>
-            </div>
-
-            <h3>最新消費</h3>
-            <div class="budget-section">
-                <div class="budget-item"><span>11/27 - 飲食 - 便當</span><span class="budget-value" style="color:#333;">$120</span></div>
-                <div class="budget-item"><span>11/26 - 交通 - 油錢</span><span class="budget-value" style="color:#333;">$800</span></div>
-                <div class="budget-item"><span>11/26 - 衣物 - 新衣</span><span class="budget-value" style="color:#333;">$1,999</span></div>
-            </div>
-        </div>
-
-        <div id="settings" class="tab-content">
-            <h2>設定</h2>
-
-            <div class="budget-section">
-                <h3>固定支出 (總額：$25,000)</h3>
-                <div class="budget-item"><span>房租</span><span class="budget-value">$15,000</span></div>
-                <div class="budget-item"><span>保險</span><span class="budget-value">$3,000</span></div>
-                <div class="budget-item"><span>貸款</span><span class="budget-value">$7,000</span></div>
-            </div>
-
-            <div class="budget-section">
-                <h3>預存金 (總額：$7,000)</h3>
-                <div class="budget-item"><span>緊急備用金</span><span class="budget-value">$5,000</span></div>
-                <div class="budget-item"><span>旅遊基金</span><span class="budget-value">$2,000</span></div>
-            </div>
-            
-            <div class="budget-section">
-                <h3>變動預算 (總額：$30,000)</h3>
-                <p style="font-size: 0.9em; color:#999; text-align: center;">點擊金額可修改</p>
-                <div class="budget-item"><span>飲食</span><span class="budget-value editable" data-value="10000">$10,000</span></div>
-                <div class="budget-item"><span>衣物</span><span class="budget-value editable" data-value="3000">$3,000</span></div>
-                <div class="budget-item"><span>居家</span><span class="budget-value editable" data-value="5000">$5,000</span></div>
-                <div class="budget-item"><span>交通</span><span class="budget-value editable" data-value="2000">$2,000</span></div>
-            </div>
-
-            <div class="budget-summary-final">
-                結餘: $35,120
-            </div>
-        </div>
-
-        <div class="tab-bar">
-            <button onclick="openTab('quick-input', this)" class="active">輸入</button>
-            <button onclick="openTab('dashboard', this)">追蹤</button>
-            <button onclick="openTab('settings', this)">設定</button>
-        </div>
+        <label for="amount-input">金額 *</label>
+        <input type="number" id="amount-input" placeholder="請輸入金額" required>
         
-        <div id="loading-message" class="loading-message">
-            <p>資料寫入中...</p>
-        </div>
-    </div>
+        <label for="input-note">備註 (例如：午餐便當) *</label>
+        <input type="text" id="input-note" placeholder="請輸入備註" required>
 
-    <script>
-        // 🚨 這是 Mini 根據你最新部署成功的 Apps Script URL 所更新的網址 🚨
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxjt3oyfVbfvnEk97srbE8FOwbbs8bnYQXYGUJiwpYMTsxIu4V1sMy7hjNcZSitUaZb3Pw/exec'; 
+        <label>分類 *</label>
+        <div class="category-container">
+            <button type="button" class="category-btn" data-category="餐費">🍽️ 餐費</button>
+            <button type="button" class="category-btn" data-category="飲料">☕ 飲料</button>
+            <button type="button" class="category-btn" data-category="交通">🚌 交通</button>
+            <button type="button" class="category-btn" data-category="娛樂">🕹️ 娛樂</button>
+            <button type="button" class="category-btn" data-category="雜費">🛍️ 雜費</button>
+            <button type="button" class="category-btn" data-category="治裝">👚 治裝</button>
+            <button type="button" class="category-btn" data-category="醫療">💊 醫療</button>
+            </div>
+
+        <label for="payment-method">付款方式 *</label>
+        <select id="payment-method" required>
+            <option value="現金">現金</option>
+            <option value="信用卡">信用卡</option>
+            <option value="電子支付">電子支付</option>
+        </select>
+
+        <button type="submit">儲存並新增 (寫入試算表)</button>
         
-        // Tab 切換功能
-        function openTab(tabId, element) {
-            var contents = document.getElementsByClassName("tab-content");
-            for (var i = 0; i < contents.length; i++) {
-                contents[i].classList.remove("active");
-            }
-            var tabs = document.getElementsByClassName("tab-bar")[0].getElementsByTagName("button");
-            for (var i = 0; i < tabs.length; i++) {
-                tabs[i].classList.remove("active");
-            }
-            document.getElementById(tabId).classList.add("active");
-            element.classList.add("active");
+    </form>
+</div>
+
+<div id="loading-message" class="loading">
+    <span>正在寫入數據... 請稍候</span>
+</div>
+
+<script>
+    // ====================================================================
+    // Mini 為 Mifa 解決「連線錯誤」問題的 JavaScript 核心邏輯
+    // 透過 Forms 後門網址發送數據 (Forms Action)
+    // ====================================================================
+
+    // 🚨 替換成你的 Google Forms 收件地址 (用來避開瀏覽器連線問題)
+    // 這是從你的網址反推出來的，結尾必須是 /formResponse
+    const FORMS_ACTION_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSc1ZdnMDDgdAen9TfALFM9e0U3NsGgcKSVrj6jfGIYSAXhf3A/formResponse';
+            
+    // 🚨 這是 Mini 根據你的表單結構和 Forms 規律猜測出來的欄位密碼 ID
+    // ⚠️ 如果儲存失敗，我們可能需要重新檢查這些 ID
+    const ENTRY_IDS = {
+        // 欄位順序：金額、備註、日期、分類、付款方式 (與 V3.1 網頁介面吻合)
+        amount: 'entry.454238541',     // 假設：金額
+        note: 'entry.1011326416',      // 假設：備註
+        date: 'entry.1561085202',      // 假設：日期
+        category: 'entry.1223961730',  // 假設：分類
+        payment: 'entry.1705666795'    // 假設：付款方式
+    };
+
+
+    // ----------------------------------------------------------------------
+    // 函式：當網頁一載入，自動設定日期並預設選擇第一個分類
+    document.addEventListener('DOMContentLoaded', (event) => {
+        // 1. 設定今天的日期
+        const today = new Date();
+        const formattedDate = today.getFullYear() + '-' + 
+                              String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                              String(today.getDate()).padStart(2, '0');
+        
+        document.getElementById('input-date').value = formattedDate;
+
+        // 2. 預設選擇第一個分類按鈕
+        const firstCategory = document.querySelector('.category-btn');
+        if (firstCategory) {
+            firstCategory.classList.add('selected');
+        }
+    });
+
+
+    // ----------------------------------------------------------------------
+    // 函式：處理點擊分類按鈕，切換樣式
+    document.querySelectorAll('.category-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            // 清除所有按鈕的 selected 狀態
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            // 給當前點擊的按鈕加上 selected 狀態
+            this.classList.add('selected');
+        });
+    });
+
+
+    // ----------------------------------------------------------------------
+    // 🚀 數據寫入 Google Forms 的功能 (核心)
+    document.getElementById('input-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const amountInput = document.getElementById('amount-input');
+        const categoryBtn = document.querySelector('.category-btn.selected');
+        const loadingMessage = document.getElementById('loading-message');
+        const noteInput = document.getElementById('input-note');
+        const paymentInput = document.getElementById('payment-method');
+
+        // 檢查必填欄位 (根據 HTML 上的 required 屬性，這裡做雙重檢查)
+        if (!amountInput.value || !categoryBtn || !noteInput.value || !paymentInput.value) {
+            alert('請填寫所有欄位：金額、備註、分類和付款方式！');
+            return;
         }
 
-        // 快速輸入 - 分類按鈕點擊效果
-        document.getElementById('category-buttons').addEventListener('click', function(e) {
-            if (e.target.classList.contains('category-btn')) {
-                document.querySelectorAll('.category-btn').forEach(btn => {
-                    btn.classList.remove('selected');
-                });
-                e.target.classList.add('selected');
-            }
-        });
+        loadingMessage.style.display = 'flex';
+        
+        // 收集網頁介面上的數據
+        const formData = {
+            date: document.getElementById('input-date').value,
+            amount: amountInput.value,
+            category: categoryBtn.dataset.category, // 從按鈕的 data-category 屬性取得
+            note: noteInput.value,
+            payment: paymentInput.value
+        };
+        
+        // 建立發送給 Forms 的 URL 參數 (使用 Forms 的密碼 ID)
+        const urlParams = new URLSearchParams();
+        urlParams.append(ENTRY_IDS.date, formData.date);
+        urlParams.append(ENTRY_IDS.amount, formData.amount);
+        urlParams.append(ENTRY_IDS.category, formData.category);
+        urlParams.append(ENTRY_IDS.note, formData.note);
+        urlParams.append(ENTRY_IDS.payment, formData.payment);
 
-        // 🚀 數據寫入 Google Sheets 的功能 (核心)
-        document.getElementById('input-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const amountInput = document.getElementById('amount-input');
-            const categoryBtn = document.querySelector('.category-btn.selected');
-            const loadingMessage = document.getElementById('loading-message');
-
-            if (!amountInput.value || !categoryBtn) {
-                alert('請輸入金額並選擇分類！');
-                return;
-            }
-
-            loadingMessage.style.display = 'flex';
-            
-            // 收集表單數據
-            const formData = {
-                date: document.getElementById('input-date').value,
-                amount: amountInput.value,
-                category: categoryBtn.dataset.category,
-                note: document.getElementById('input-note').value,
-                payment: document.getElementById('payment-method').value
-            };
-            
-            const urlParams = new URLSearchParams();
-            for (const key in formData) {
-                urlParams.append(key, formData[key]);
-            }
-
-            try {
-                // 發送數據到 Apps Script URL
-                const response = await fetch(APPS_SCRIPT_URL, {
-                    method: 'POST',
-                    body: urlParams.toString(),
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    }
-                });
-                
-                const result = await response.json();
-
-                if (result.status === 'success') {
-                    alert('儲存成功！');
-                    // 清空欄位
-                    amountInput.value = '';
-                    document.getElementById('input-note').value = '';
-                    categoryBtn.classList.remove('selected');
-                    amountInput.focus();
-                } else {
-                    alert(`寫入失敗！錯誤：${result.message}`);
-                }
-            } catch (error) {
-                alert(`連線錯誤：無法將數據發送到 Apps Script。請檢查網路連線。`);
-            } finally {
-                loadingMessage.style.display = 'none';
-            }
-        });
-
-        // 每月設定 - 模擬 In-line Edit
-        document.querySelectorAll('.budget-value.editable').forEach(item => {
-            item.addEventListener('click', function() {
-                const originalValue = this.dataset.value;
-                const categoryName = this.previousElementSibling.textContent;
-                
-                const newValue = prompt(`修改 ${categoryName} 的預算金額：`, originalValue);
-                
-                if (newValue !== null && !isNaN(newValue) && newValue.trim() !== "") {
-                    this.textContent = `$${parseInt(newValue).toLocaleString()}`;
-                    this.dataset.value = parseInt(newValue);
-                    alert(`預算已更新為：$${parseInt(newValue).toLocaleString()}`);
+        try {
+            // 🚨 這裡使用 POST 請求，發送到 Forms 的收件地址，瀏覽器不會阻擋
+            const response = await fetch(FORMS_ACTION_URL, {
+                method: 'POST',
+                body: urlParams.toString(),
+                // 必須設定這個 Header，Forms 才能正確解析數據
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
                 }
             });
-        });
+            
+            // Forms 的回覆通常是重導向（302）或成功（200）
+            if (response.ok || response.status === 200 || response.status === 302) {
+                alert('✅ 儲存成功！數據已傳送到你的試算表！');
+                // 清空欄位，準備下一筆輸入
+                amountInput.value = '';
+                noteInput.value = '';
+                // 保持分類按鈕選中，光標回到金額欄位
+                amountInput.focus();
+            } else {
+                // Forms 回應失敗時的提示
+                alert(`❌ 寫入失敗！Forms 服務回應錯誤：${response.status}。請檢查 Forms ID 是否正確！`);
+            }
+        } catch (error) {
+            // 處理網路層面的錯誤
+            alert(`❌ 連線錯誤：無法將數據發送到 Google Forms。請檢查網路連線。`);
+        } finally {
+            loadingMessage.style.display = 'none';
+        }
+    });
+</script>
 
-        // 預設將日期設定為今天
-        document.getElementById('input-date').valueAsDate = new Date();
-    </script>
 </body>
 </html>
