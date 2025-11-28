@@ -1,158 +1,438 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>KFC 問卷小工具</title>
-  <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      background-color: #fdf9f4;
-      font-family: "Microsoft JhengHei", sans-serif;
-      font-weight: bold;
-      overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini 記帳表原型 - 給 Mifa</title>
+    <style>
+        /* --- 基礎樣式與手機模擬 --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background-color: #f4f7f9;
+            color: #333;
+            overflow-x: hidden;
+        }
 
-    .container {
-      width: 520px;
-      background: linear-gradient(to bottom, #fffaf4, #f5ede5);
-      border-radius: 20px;
-      box-shadow: 0 0 18px rgba(0, 0, 0, 0.08);
-      text-align: center;
-      padding: 30px 25px;
-      box-sizing: border-box;
-      margin-top: 5%;
-    }
+        .container {
+            max-width: 450px; /* 模擬手機寬度 */
+            margin: 0 auto;
+            background-color: #fff;
+            min-height: 100vh;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
 
-    h2 {
-      font-size: 30px;
-      font-weight: bold;
-      color: #4a3c2b;
-      margin-bottom: 24px;
-      padding: 12px 24px;
-      border: 2px solid #cbbca9;
-      background-color: #f2e8dc;
-      border-radius: 12px;
-      display: inline-block;
-    }
+        /* --- 導航列 --- */
+        .tab-bar {
+            display: flex;
+            justify-content: space-around;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 450px;
+            background-color: #fff;
+            border-top: 1px solid #eee;
+            z-index: 100;
+        }
 
-    input[type="text"] {
-      width: 90%;
-      padding: 14px;
-      font-size: 20px;
-      font-weight: bold;
-      text-align: center;
-      border-radius: 6px;
-      border: 2px solid #bda993;
-      background-color: #fffdfb;
-      margin-top: 10px;
-    }
+        .tab-bar button {
+            background: none;
+            border: none;
+            padding: 15px 0;
+            flex-grow: 1;
+            cursor: pointer;
+            font-size: 14px;
+            color: #999;
+            transition: color 0.3s;
+        }
 
-    .btn-group {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      margin-top: 28px;
-      gap: 14px;
-    }
+        .tab-bar button.active {
+            color: #007bff;
+            border-top: 2px solid #007bff;
+        }
 
-    .btn-group button {
-      width: 48%;
-      padding: 16px 0;
-      font-size: 20px;
-      font-weight: bold;
-      background: linear-gradient(to bottom, #e8ddcf, #ddd2c5);
-      border: 2px solid #b9a48d;
-      border-radius: 8px;
-      color: #3c2d20;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
+        .tab-content {
+            padding: 20px 15px 70px 15px; /* 底部留給導航列空間 */
+            display: none;
+        }
 
-    .btn-group button:hover {
-      background: linear-gradient(to bottom, #d6c4b3, #cbb7a5);
-    }
-  </style>
+        .tab-content.active {
+            display: block;
+        }
+
+        h2 {
+            color: #007bff;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        /* --- 畫面一：快速輸入 (Focus: 順手度) --- */
+        #input-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        #amount-input {
+            width: 100%;
+            padding: 20px 10px;
+            font-size: 2.5em; /* 醒目 */
+            text-align: right;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 常用分類大按鈕 */
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .category-btn {
+            background-color: #e9ecef;
+            color: #333;
+            border: none;
+            padding: 15px 5px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .category-btn.selected {
+            background-color: #28a745; /* 選中變綠色 */
+            color: white;
+            font-weight: bold;
+        }
+
+        .save-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+        /* --- 畫面二：儀表板 --- */
+        .summary-box {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .summary-box h3 {
+            margin: 0 0 5px 0;
+            font-size: 1.1em;
+            opacity: 0.8;
+        }
+
+        .summary-box p {
+            font-size: 2.5em;
+            margin: 0;
+            font-weight: bold;
+        }
+
+        .progress-bar-container {
+            background-color: #ddd;
+            border-radius: 5px;
+            margin-top: 10px;
+            overflow: hidden;
+            height: 15px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 75%; /* 模擬進度 75% */
+            background-color: #28a745;
+        }
+        
+        .daily-tip {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ffeeba;
+            font-size: 0.9em;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .chart-placeholder {
+            height: 200px;
+            background-color: #e9ecef;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        /* --- 畫面三：每月設定 --- */
+        .budget-section {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #eee;
+        }
+
+        .budget-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dashed #ddd;
+            font-size: 1em;
+        }
+        
+        .budget-item:last-child {
+            border-bottom: none;
+        }
+        
+        .budget-value {
+            font-weight: bold;
+            color: #dc3545; /* 支出或預算用紅色系 */
+        }
+
+        .budget-summary-final {
+            font-size: 1.2em;
+            font-weight: bold;
+            padding-top: 15px;
+            color: #28a745; /* 結餘用綠色 */
+        }
+
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h2>小工具🛠️</h2>
 
-    <input id="store" type="text" maxlength="3" value="226" />
+    <div class="container">
+        <div id="quick-input" class="tab-content active">
+            <h2>💰 快速輸入</h2>
+            
+            <form id="input-form">
+                <input type="number" id="amount-input" placeholder="0.00" inputmode="decimal">
 
-    <div class="btn-group">
-      <button onclick="generate('2','3','2','normal')">內用 / 點餐機</button>
-      <button onclick="generate('4','3','2','normal')">外帶 / 點餐機</button>
-      <button onclick="generate('2','2','2','normal')">內用 / 櫃檯</button>
-      <button onclick="generate('4','2','2','normal')">外帶 / 櫃檯</button>
-      <button onclick="generate('2','4','2','normal')">快取</button>
-      <button onclick="generate('1','4','2','delivery')">外送</button>
+                <div class="input-group">
+                    <label for="input-date">日期</label>
+                    <input type="date" id="input-date" value="2025-11-28">
+                </div>
+                
+                <div class="input-group">
+                    <label for="input-note">備註 (例如：午餐便當)</label>
+                    <input type="text" id="input-note" placeholder="輸入消費項目描述">
+                </div>
+                
+                <div class="input-group">
+                    <label>選擇分類 (點擊按鈕)</label>
+                    <div class="category-grid" id="category-buttons">
+                        <button type="button" class="category-btn" data-category="餐飲">🍔 餐飲</button>
+                        <button type="button" class="category-btn" data-category="交通">🚌 交通</button>
+                        <button type="button" class="category-btn" data-category="飲料">☕ 飲料</button>
+                        <button type="button" class="category-btn" data-category="娛樂">🎮 娛樂</button>
+                        <button type="button" class="category-btn" data-category="治裝">👚 治裝</button>
+                        <button type="button" class="category-btn" data-category="雜費">🛒 雜費</button>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="payment-method">付款方式</label>
+                    <select id="payment-method">
+                        <option value="cash">現金</option>
+                        <option value="credit">信用卡</option>
+                        <option value="mobile">電子支付</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="save-btn">✅ 儲存並新增</button>
+            </form>
+            <p style="text-align: center; margin-top: 15px; font-size: 0.8em; color: #999;">資料不會被儲存，僅為介面模擬。</p>
+        </div>
+
+        <div id="dashboard" class="tab-content">
+            <h2>📈 儀表板 (本月追蹤)</h2>
+
+            <div class="summary-box">
+                <h3>預計結餘 (模擬)</h3>
+                <p>$35,120</p>
+                <div class="progress-bar-container">
+                    <div class="progress-bar"></div>
+                </div>
+                <small>變動支出預算已使用 75%</small>
+            </div>
+            
+            <div class="daily-tip">
+                今日安全日均消費額：**$1,250** (模擬)
+            </div>
+
+            <div class="chart-placeholder">
+                <p>分類圓餅圖 (模擬)</p>
+            </div>
+
+            <div class="budget-section">
+                <h3>分類預算與花費對比</h3>
+                <div class="budget-item">
+                    <span>🍔 餐飲預算/花費</span>
+                    <span class="budget-value">$10,000 / $8,500</span>
+                </div>
+                <div class="budget-item">
+                    <span>🚌 交通預算/花費</span>
+                    <span class="budget-value" style="color:#dc3545;">$3,000 / $3,500 (超支!)</span>
+                </div>
+                <div class="budget-item">
+                    <span>🎮 娛樂預算/花費</span>
+                    <span class="budget-value">$5,000 / $1,200</span>
+                </div>
+            </div>
+
+            <h3>最新消費明細</h3>
+            <div class="budget-section">
+                <div class="budget-item">
+                    <span>11/27 - 🍔 便當</span>
+                    <span class="budget-value" style="color:#333;">$120</span>
+                </div>
+                <div class="budget-item">
+                    <span>11/26 - 🚌 油錢</span>
+                    <span class="budget-value" style="color:#333;">$800</span>
+                </div>
+                <div class="budget-item">
+                    <span>11/26 - 👚 新衣</span>
+                    <span class="budget-value" style="color:#333;">$1,999</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="settings" class="tab-content">
+            <h2>⚙️ 每月設定 (2025/11)</h2>
+
+            <div class="budget-section">
+                <h3>固定支出 (總額模擬：$25,000)</h3>
+                <div class="budget-item"><span>房租</span><span class="budget-value">$15,000</span></div>
+                <div class="budget-item"><span>保險</span><span class="budget-value">$3,000</span></div>
+                <div class="budget-item"><span>貸款 (M)</span><span class="budget-value">$7,000</span></div>
+            </div>
+
+            <div class="budget-section">
+                <h3>預存備用金 (總額模擬：$7,000)</h3>
+                <div class="budget-item"><span>緊急備用金</span><span class="budget-value">$5,000</span></div>
+                <div class="budget-item"><span>旅遊基金</span><span class="budget-value">$2,000</span></div>
+            </div>
+            
+            <div class="budget-section">
+                <h3>變動支出預算 (總額模擬：$30,000)</h3>
+                <p style="font-size: 0.9em; color:#6c757d;">點擊金額可修改 (模擬 In-line Edit)</p>
+                <div class="budget-item"><span>🍔 餐飲</span><span class="budget-value editable" data-value="10000">$10,000</span></div>
+                <div class="budget-item"><span>🚌 交通</span><span class="budget-value editable" data-value="3000">$3,000</span></div>
+                <div class="budget-item"><span>🎮 娛樂</span><span class="budget-value editable" data-value="5000">$5,000</span></div>
+                <div class="budget-item"><span>☕ 飲料</span><span class="budget-value editable" data-value="2000">$2,000</span></div>
+            </div>
+
+            <div class="budget-summary-final">
+                最終存款前 (結餘): $35,120
+            </div>
+        </div>
+
+        <div class="tab-bar">
+            <button onclick="openTab('quick-input', this)" class="active">輸入</button>
+            <button onclick="openTab('dashboard', this)">追蹤</button>
+            <button onclick="openTab('settings', this)">設定</button>
+        </div>
     </div>
-  </div>
 
-  <script>
-    const deliveryTailCodes = [
-      "10050001", "14480005", "13350004", "12230003", "18600010",
-      "20010001", "00040004", "00010004", "6449000"
-    ];
-    const normalTailCodes = [
-      "0053", "0041", "0026", "0061", "0003", "0004", "0005", "0010",
-      "0030", "0011", "0020", "0022", "0033", "0065", "0071", "0088"
-    ];
+    <script>
+        // Tab 切換功能
+        function openTab(tabId, element) {
+            // 隱藏所有內容
+            var contents = document.getElementsByClassName("tab-content");
+            for (var i = 0; i < contents.length; i++) {
+                contents[i].classList.remove("active");
+            }
+            // 移除所有按鈕的 active 狀態
+            var tabs = document.getElementsByClassName("tab-bar")[0].getElementsByTagName("button");
+            for (var i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove("active");
+            }
 
-    function getYesterdayDateStr() {
-      const d = new Date();
-      d.setDate(d.getDate() - 1);
-      return d.getFullYear().toString() +
-             String(d.getMonth() + 1).padStart(2, '0') +
-             String(d.getDate()).padStart(2, '0');
-    }
+            // 顯示當前內容並設定 active 狀態
+            document.getElementById(tabId).classList.add("active");
+            element.classList.add("active");
+        }
 
-    function getRandomTimeCode() {
-      const h = String(Math.floor(Math.random() * 13) + 10).padStart(2, '0');
-      const m = String(Math.floor(Math.random() * 60)).padStart(2, '0');
-      const s = String(Math.floor(Math.random() * 60)).padStart(2, '0');
-      return h + m + s;
-    }
+        // 快速輸入 - 分類按鈕點擊效果
+        document.getElementById('category-buttons').addEventListener('click', function(e) {
+            if (e.target.classList.contains('category-btn')) {
+                // 移除其他按鈕的 selected 狀態
+                document.querySelectorAll('.category-btn').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+                // 設定當前按鈕為 selected
+                e.target.classList.add('selected');
+            }
+        });
 
-    function generate(M, O, K, type) {
-      let store = document.getElementById("store").value.trim();
-      if (store.length === 2) store = "0" + store;
-      if (store.length !== 3 || isNaN(store)) {
-        alert("請輸入有效的3碼門市代碼");
-        return;
-      }
+        // 快速輸入 - 儲存按鈕模擬
+        document.getElementById('input-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const amount = document.getElementById('amount-input').value;
+            const categoryBtn = document.querySelector('.category-btn.selected');
+            
+            if (amount && categoryBtn) {
+                alert(`模擬儲存成功！\n金額: ${amount}\n分類: ${categoryBtn.dataset.category}\n\n (此為前端模擬，資料不會儲存)`);
+                // 清空欄位 (模擬儲存後重置，準備下一筆輸入)
+                document.getElementById('amount-input').value = '';
+                document.getElementById('input-note').value = '';
+                categoryBtn.classList.remove('selected');
+                document.getElementById('amount-input').focus();
+            } else {
+                alert('請輸入金額並選擇分類！');
+            }
+        });
 
-      const prefix = store.startsWith("5") ? "TWB" : "TWI";
-      const date = getYesterdayDateStr();
-      const timeCode = getRandomTimeCode();
-      const tail = type === 'delivery'
-        ? deliveryTailCodes[Math.floor(Math.random() * deliveryTailCodes.length)]
-        : normalTailCodes[Math.floor(Math.random() * normalTailCodes.length)];
-      const u = prefix + store + date + tail;
+        // 每月設定 - 模擬 In-line Edit
+        document.querySelectorAll('.budget-value.editable').forEach(item => {
+            item.addEventListener('click', function() {
+                const originalText = this.textContent;
+                const originalValue = this.dataset.value;
+                const categoryName = this.previousElementSibling.textContent;
+                
+                const newValue = prompt(`修改 ${categoryName} 的預算金額：`, originalValue);
+                
+                if (newValue !== null && !isNaN(newValue) && newValue.trim() !== "") {
+                    // 模擬更新
+                    this.textContent = `$${parseInt(newValue).toLocaleString()}`;
+                    this.dataset.value = parseInt(newValue);
+                    alert(`預算已模擬更新為：$${parseInt(newValue).toLocaleString()}`);
+                }
+            });
+        });
 
-      const payload = {
-        S: "886K" + prefix + store,
-        U: u,
-        D: date,
-        T: timeCode,
-        Country: "TW",
-        O: O,
-        M: M,
-        K: K
-      };
+        // 預設將日期設定為今天
+        document.getElementById('input-date').valueAsDate = new Date();
 
-      const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
-      const url = `https://customer.kfc-listens.com/jfe/form/SV_1R1VSPEYVPlV1JA?Q_EED=${encoded}`;
-
-      navigator.clipboard.writeText(url).then(() => {
-        alert("✅已複製成功");
-      });
-    }
-  </script>
+    </script>
 </body>
 </html>
