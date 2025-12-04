@@ -41,12 +41,11 @@
 
         // --- 主應用程式元件 ---
         function App() {
-            // 由於 HTML 環境無法直接使用 Lucide React Components，這裡我們使用內嵌 SVG 或簡化處理
-            // 不過我們使用 @babel/standalone，可以直接使用 React components，所以我們使用 `lucide` 全域變數
-
+            
             const STORAGE_KEY = 'mifa_expenses_v2';
 
             const [expenses, setExpenses] = React.useState(() => {
+                // 嘗試從瀏覽器的 localStorage 載入儲存的資料
                 const saved = localStorage.getItem(STORAGE_KEY);
                 return saved ? JSON.parse(saved) : [];
             });
@@ -57,10 +56,12 @@
             const [paymentMethod, setPaymentMethod] = React.useState('現金');
             const [view, setView] = React.useState('add'); // 'add', 'stats', 'list'
 
+            // 當 expenses 改變時，自動儲存到 localStorage
             React.useEffect(() => {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(expenses));
             }, [expenses]);
 
+            // 支出分類列表 (食衣住行育樂)
             const categories = [
                 { id: '食', name: '食', icon: <Utensils size={20} /> },
                 { id: '衣', name: '衣', icon: <Shirt size={20} /> },
@@ -70,12 +71,14 @@
                 { id: '樂', name: '樂', icon: <Smile size={20} /> },
             ];
 
+            // 支付方式列表
             const paymentMethods = [
                 { id: '現金', name: '現金', icon: <Wallet size={18} /> },
                 { id: '信用卡', name: '信用卡', icon: <CreditCard size={18} /> },
                 { id: '行動支付', name: '行動支付', icon: <Smartphone size={18} /> },
             ];
 
+            // 處理表單提交，新增一筆記帳紀錄
             const handleSubmit = (e) => {
                 e.preventDefault();
                 if (!amount || isNaN(parseFloat(amount)) || parseFloat(amount) <= 0) return;
@@ -96,13 +99,16 @@
                 setPaymentMethod('現金');
             };
 
+            // 刪除一筆紀錄
             const deleteExpense = (id) => {
                 if (window.confirm('確定要刪除這筆紀錄嗎？')) {
                     setExpenses(expenses.filter(exp => exp.id !== id));
                 }
             };
 
+            // 匯出 CSV 檔案
             const exportToCSV = () => {
+                // 加入 BOM 讓 Excel 正確讀取 UTF-8 中文
                 const BOM = "\uFEFF";
                 const headers = "日期,分類,支付方式,金額,備註\n";
                 const csvContent = expenses.map(e => `${e.date},${e.category},${e.paymentMethod},${e.amount},${e.note}`).join("\n");
@@ -116,7 +122,7 @@
                 document.body.removeChild(link);
             };
 
-            // Statistics Calculation
+            // 統計計算 (當月資料)
             const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
             const monthExpenses = expenses.filter(e => e.date.startsWith(currentMonth));
             const totalAmount = monthExpenses.reduce((acc, curr) => acc + curr.amount, 0);
@@ -128,6 +134,7 @@
                 return { ...cat, sum, percentage: totalAmount === 0 ? 0 : Math.round((sum / totalAmount) * 100) };
             }).sort((a, b) => b.sum - a.sum);
 
+            // 用於統計圖表的灰階顏色計算 (根據排名深淺)
             const getGrayScaleColor = (index, total) => {
                 const intensity = Math.round(240 - (index / total) * 180); 
                 return `rgb(${intensity}, ${intensity}, ${intensity})`;
@@ -135,7 +142,7 @@
 
             return (
                 <div className="min-h-screen bg-white text-gray-900 font-sans pb-24 relative">
-                    {/* Header */}
+                    {/* Header: APP 標題與匯出按鈕 */}
                     <div className="bg-white sticky top-0 z-10 border-b border-gray-200">
                         <div className="max-w-md mx-auto px-4 py-4 flex justify-between items-center">
                             <h1 className="text-lg font-bold flex items-center gap-2">
@@ -152,13 +159,13 @@
 
                     <div className="max-w-md mx-auto p-4 space-y-6">
                         
-                        {/* VIEW: ADD EXPENSE */}
+                        {/* 視圖: ADD EXPENSE (新增記帳) */}
                         {view === 'add' && (
                             <div className="animate-fade-in">
                                 <div className="bg-white p-1 rounded-2xl">
                                     <form onSubmit={handleSubmit} className="space-y-6">
                                         
-                                        {/* Amount Input */}
+                                        {/* 金額輸入 */}
                                         <div className="relative">
                                             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-gray-400">$</span>
                                             <input
@@ -172,7 +179,7 @@
                                             />
                                         </div>
 
-                                        {/* Categories Grid */}
+                                        {/* 分類按鈕 (食衣住行育樂) */}
                                         <div className="grid grid-cols-3 gap-3">
                                             {categories.map((cat) => (
                                                 <button
@@ -191,7 +198,7 @@
                                             ))}
                                         </div>
 
-                                        {/* Payment Method Selection */}
+                                        {/* 支付方式選擇 */}
                                         <div>
                                             <label className="block text-sm font-medium text-gray-600 mb-2 pl-1">支付方式</label>
                                             <div className="flex gap-2">
@@ -213,7 +220,7 @@
                                             </div>
                                         </div>
 
-                                        {/* Note Input */}
+                                        {/* 備註輸入 */}
                                         <input
                                             type="text"
                                             value={note}
@@ -222,7 +229,7 @@
                                             className="w-full bg-gray-50 px-4 py-4 rounded-xl border border-gray-200 focus:border-black focus:outline-none transition-colors text-gray-700"
                                         />
 
-                                        {/* Submit Button */}
+                                        {/* 儲存按鈕 */}
                                         <button
                                             type="submit"
                                             disabled={!amount}
@@ -233,7 +240,7 @@
                                     </form>
                                 </div>
 
-                                {/* Recent 3 Items Preview */}
+                                {/* 最近 3 筆預覽 */}
                                 <div className="mt-8">
                                     <h3 className="text-sm font-bold text-gray-400 mb-3 pl-1 tracking-wider uppercase">最近紀錄</h3>
                                     <div className="space-y-3">
@@ -259,16 +266,16 @@
                             </div>
                         )}
 
-                        {/* VIEW: STATS DASHBOARD */}
+                        {/* 視圖: STATS DASHBOARD (分析儀表板) */}
                         {view === 'stats' && (
                             <div className="animate-fade-in space-y-6">
-                                {/* Total Card */}
+                                {/* 總支出卡片 */}
                                 <div className="bg-black text-white p-6 rounded-3xl shadow-xl">
                                     <div className="text-gray-400 text-sm mb-1 font-medium">{new Date().getMonth() + 1} 月總支出</div>
                                     <div className="text-5xl font-bold tracking-tight">${totalAmount.toLocaleString()}</div>
                                 </div>
 
-                                {/* Category Breakdown */}
+                                {/* 分類佔比分析 */}
                                 <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
                                     <h3 className="font-bold text-gray-800 mb-6 flex items-center gap-2 text-lg">
                                         <PieChart size={20} className="text-black"/> 消費分析
@@ -296,7 +303,7 @@
                             </div>
                         )}
 
-                        {/* VIEW: FULL LIST */}
+                        {/* 視圖: FULL LIST (所有明細) */}
                         {view === 'list' && (
                             <div className="animate-fade-in">
                                 <h2 className="text-lg font-bold mb-6 text-gray-800 pl-1">所有紀錄 ({expenses.length})</h2>
@@ -336,7 +343,7 @@
                         )}
                     </div>
 
-                    {/* Bottom Navigation */}
+                    {/* 底部導航欄 */}
                     <div className="fixed bottom-4 left-4 right-4 bg-black rounded-full shadow-2xl p-2 z-20 max-w-md mx-auto">
                         <div className="flex justify-between items-center px-4">
                             <button 
